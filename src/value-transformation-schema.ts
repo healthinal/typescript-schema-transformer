@@ -52,12 +52,18 @@ export const requiredNumberSchema = createValueTransformationSchema<number>(
   0,
   isNumber
 );
+export const optionalNumberSchema = createValueTransformationSchemaForOptionalValue<
+  number
+>('number', isNumber);
 
 export const requiredBooleanSchema = createValueTransformationSchema<boolean>(
   'boolean',
   false,
   isBoolean
 );
+export const optionalBooleanSchema = createValueTransformationSchemaForOptionalValue<
+  boolean
+>('boolean', isBoolean);
 
 export const requiredDateSchema = createValueTransformationSchema<string>(
   'date',

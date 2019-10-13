@@ -3,7 +3,9 @@ import { filter, values } from 'ramda';
 import {
   addStaticValueSchema,
   noTransformationSchema,
+  optionalBooleanSchema,
   optionalColorStringSchema,
+  optionalNumberSchema,
   optionalStringSchema,
   requiredBooleanSchema,
   requiredDateSchema,
@@ -100,6 +102,29 @@ describe('requiredNumberSchema()', () => {
   });
 });
 
+describe('optionalNumberSchema()', () => {
+  assert({
+    given: 'a number',
+    should: 'return the value without validation remark',
+    actual: () => optionalNumberSchema()(123),
+    expected: [123, undefined],
+  });
+
+  assert({
+    given: 'undefined',
+    should: 'return undefined without validation remark',
+    actual: () => optionalNumberSchema()(undefined),
+    expected: [undefined, undefined],
+  });
+
+  assert({
+    given: 'a string',
+    should: 'return undefined and validation remark',
+    actual: () => optionalNumberSchema()('foo'),
+    expected: [undefined, getValidationRemark('number', 'foo', undefined)],
+  });
+});
+
 describe('requiredBooleanSchema()', () => {
   assert({
     given: 'a boolean',
@@ -127,6 +152,29 @@ describe('requiredBooleanSchema()', () => {
     should: 'return the special default value',
     actual: () => requiredBooleanSchema(true)(undefined),
     expected: [true, getValidationRemark('boolean', undefined, true)],
+  });
+});
+
+describe('optionalBooleanSchema()', () => {
+  assert({
+    given: 'a boolean',
+    should: 'return the value without validation remark',
+    actual: () => optionalBooleanSchema()(true),
+    expected: [true, undefined],
+  });
+
+  assert({
+    given: 'undefined',
+    should: 'return undefined without validation remark',
+    actual: () => optionalBooleanSchema()(undefined),
+    expected: [undefined, undefined],
+  });
+
+  assert({
+    given: 'a string',
+    should: 'return undefined and validation remark',
+    actual: () => optionalBooleanSchema()('foo'),
+    expected: [undefined, getValidationRemark('boolean', 'foo', undefined)],
   });
 });
 
