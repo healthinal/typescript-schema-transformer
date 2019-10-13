@@ -24,6 +24,18 @@ export type UnionType4<T1, T2, T3, T4> = {
 export type UnionType5<T1, T2, T3, T4, T5> = {
   ['some-arbitrary-name-to-prevent-structural-type-equality-5']: never;
 };
+export type UnionType6<T1, T2, T3, T4, T5, T6> = {
+  ['some-arbitrary-name-to-prevent-structural-type-equality-6']: never;
+};
+export type UnionType7<T1, T2, T3, T4, T5, T6, T7> = {
+  ['some-arbitrary-name-to-prevent-structural-type-equality-7']: never;
+};
+export type UnionType8<T1, T2, T3, T4, T5, T6, T7, T8> = {
+  ['some-arbitrary-name-to-prevent-structural-type-equality-8']: never;
+};
+export type UnionType9<T1, T2, T3, T4, T5, T6, T7, T8, T9> = {
+  ['some-arbitrary-name-to-prevent-structural-type-equality-9']: never;
+};
 
 export type SupportedValueTypes = boolean | number | string | undefined;
 
@@ -41,6 +53,48 @@ export type TransformationSchema<T> = [T] extends [SupportedValueTypes]
   ? UnionTypeTransformationSchema4<any, T1, T2, T3, T4>
   : T extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
   ? UnionTypeTransformationSchema5<any, T1, T2, T3, T4, T5>
+  : T extends UnionType6<
+      infer T1,
+      infer T2,
+      infer T3,
+      infer T4,
+      infer T5,
+      infer T6
+    >
+  ? UnionTypeTransformationSchema6<any, T1, T2, T3, T4, T5, T6>
+  : T extends UnionType7<
+      infer T1,
+      infer T2,
+      infer T3,
+      infer T4,
+      infer T5,
+      infer T6,
+      infer T7
+    >
+  ? UnionTypeTransformationSchema7<any, T1, T2, T3, T4, T5, T6, T7>
+  : T extends UnionType8<
+      infer T1,
+      infer T2,
+      infer T3,
+      infer T4,
+      infer T5,
+      infer T6,
+      infer T7,
+      infer T8
+    >
+  ? UnionTypeTransformationSchema8<any, T1, T2, T3, T4, T5, T6, T7, T8>
+  : T extends UnionType9<
+      infer T1,
+      infer T2,
+      infer T3,
+      infer T4,
+      infer T5,
+      infer T6,
+      infer T7,
+      infer T8,
+      infer T9
+    >
+  ? UnionTypeTransformationSchema9<any, T1, T2, T3, T4, T5, T6, T7, T8, T9>
   : ObjectTransformationSchema<T>;
 
 export type ValueTransformationSchema<T extends SupportedValueTypes> = (
@@ -58,6 +112,48 @@ export type ArrayTransformationSchema<T> = [
     ? UnionTypeTransformationSchema4<any, T1, T2, T3, T4>
     : T extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
     ? UnionTypeTransformationSchema5<any, T1, T2, T3, T4, T5>
+    : T extends UnionType6<
+        infer T1,
+        infer T2,
+        infer T3,
+        infer T4,
+        infer T5,
+        infer T6
+      >
+    ? UnionTypeTransformationSchema6<any, T1, T2, T3, T4, T5, T6>
+    : T extends UnionType7<
+        infer T1,
+        infer T2,
+        infer T3,
+        infer T4,
+        infer T5,
+        infer T6,
+        infer T7
+      >
+    ? UnionTypeTransformationSchema7<any, T1, T2, T3, T4, T5, T6, T7>
+    : T extends UnionType8<
+        infer T1,
+        infer T2,
+        infer T3,
+        infer T4,
+        infer T5,
+        infer T6,
+        infer T7,
+        infer T8
+      >
+    ? UnionTypeTransformationSchema8<any, T1, T2, T3, T4, T5, T6, T7, T8>
+    : T extends UnionType9<
+        infer T1,
+        infer T2,
+        infer T3,
+        infer T4,
+        infer T5,
+        infer T6,
+        infer T7,
+        infer T8,
+        infer T9
+      >
+    ? UnionTypeTransformationSchema9<any, T1, T2, T3, T4, T5, T6, T7, T8, T9>
     : ObjectTransformationSchema<T>
 ];
 export type ObjectTransformationSchema<T> = {
@@ -100,6 +196,81 @@ export type UnionTypeTransformationSchema5<B, T1, T2, T3, T4, T5> = {
     | TransformationSchema<T4>
     | TransformationSchema<T5>;
 };
+export type UnionTypeTransformationSchema6<B, T1, T2, T3, T4, T5, T6> = {
+  [baseTransformationSchemaKey]: TransformationSchema<B>;
+  [getTransformationSchemaKey]: (
+    base: B
+  ) =>
+    | TransformationSchema<T1>
+    | TransformationSchema<T2>
+    | TransformationSchema<T3>
+    | TransformationSchema<T4>
+    | TransformationSchema<T5>
+    | TransformationSchema<T6>;
+};
+export type UnionTypeTransformationSchema7<B, T1, T2, T3, T4, T5, T6, T7> = {
+  [baseTransformationSchemaKey]: TransformationSchema<B>;
+  [getTransformationSchemaKey]: (
+    base: B
+  ) =>
+    | TransformationSchema<T1>
+    | TransformationSchema<T2>
+    | TransformationSchema<T3>
+    | TransformationSchema<T4>
+    | TransformationSchema<T5>
+    | TransformationSchema<T6>
+    | TransformationSchema<T7>;
+};
+export type UnionTypeTransformationSchema8<
+  B,
+  T1,
+  T2,
+  T3,
+  T4,
+  T5,
+  T6,
+  T7,
+  T8
+> = {
+  [baseTransformationSchemaKey]: TransformationSchema<B>;
+  [getTransformationSchemaKey]: (
+    base: B
+  ) =>
+    | TransformationSchema<T1>
+    | TransformationSchema<T2>
+    | TransformationSchema<T3>
+    | TransformationSchema<T4>
+    | TransformationSchema<T5>
+    | TransformationSchema<T6>
+    | TransformationSchema<T7>
+    | TransformationSchema<T8>;
+};
+export type UnionTypeTransformationSchema9<
+  B,
+  T1,
+  T2,
+  T3,
+  T4,
+  T5,
+  T6,
+  T7,
+  T8,
+  T9
+> = {
+  [baseTransformationSchemaKey]: TransformationSchema<B>;
+  [getTransformationSchemaKey]: (
+    base: B
+  ) =>
+    | TransformationSchema<T1>
+    | TransformationSchema<T2>
+    | TransformationSchema<T3>
+    | TransformationSchema<T4>
+    | TransformationSchema<T5>
+    | TransformationSchema<T6>
+    | TransformationSchema<T7>
+    | TransformationSchema<T8>
+    | TransformationSchema<T9>;
+};
 
 export type DeepWithoutUnionTypes<T> = {
   [K in keyof T]: T[K] extends SupportedValueTypes
@@ -114,6 +285,48 @@ export type DeepWithoutUnionTypes<T> = {
     ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4>
     : T[K] extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
     ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5>
+    : T[K] extends UnionType6<
+        infer T1,
+        infer T2,
+        infer T3,
+        infer T4,
+        infer T5,
+        infer T6
+      >
+    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6>
+    : T[K] extends UnionType7<
+        infer T1,
+        infer T2,
+        infer T3,
+        infer T4,
+        infer T5,
+        infer T6,
+        infer T7
+      >
+    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7>
+    : T[K] extends UnionType8<
+        infer T1,
+        infer T2,
+        infer T3,
+        infer T4,
+        infer T5,
+        infer T6,
+        infer T7,
+        infer T8
+      >
+    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8>
+    : T[K] extends UnionType9<
+        infer T1,
+        infer T2,
+        infer T3,
+        infer T4,
+        infer T5,
+        infer T6,
+        infer T7,
+        infer T8,
+        infer T9
+      >
+    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>
     : DeepWithoutUnionTypes<T[K]>;
 };
 type DeepWithoutUnionTypesArray<T> = ([T] extends [SupportedValueTypes]
@@ -126,4 +339,46 @@ type DeepWithoutUnionTypesArray<T> = ([T] extends [SupportedValueTypes]
   ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4>
   : T extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
   ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5>
+  : T extends UnionType6<
+      infer T1,
+      infer T2,
+      infer T3,
+      infer T4,
+      infer T5,
+      infer T6
+    >
+  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6>
+  : T extends UnionType7<
+      infer T1,
+      infer T2,
+      infer T3,
+      infer T4,
+      infer T5,
+      infer T6,
+      infer T7
+    >
+  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7>
+  : T extends UnionType8<
+      infer T1,
+      infer T2,
+      infer T3,
+      infer T4,
+      infer T5,
+      infer T6,
+      infer T7,
+      infer T8
+    >
+  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8>
+  : T extends UnionType9<
+      infer T1,
+      infer T2,
+      infer T3,
+      infer T4,
+      infer T5,
+      infer T6,
+      infer T7,
+      infer T8,
+      infer T9
+    >
+  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>
   : DeepWithoutUnionTypes<T>)[];
