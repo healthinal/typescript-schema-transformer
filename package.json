@@ -1,0 +1,86 @@
+{
+  "name": "@healthinal/typescript-schema-transformer",
+  "version": "1.0.0",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "unpkg": "dist/ts-schema-transformer.umd.min.js",
+  "sideEffects": false,
+  "description": "Transformation library to ensure runtime types match the typescript type declarations",
+  "repository": "https://github.com/healthinal/typescript-schema-transformer.git",
+  "author": "Joel Fisch <joel.fisch@healthinal.com>",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --onlyChanged --watch",
+    "lint": "tslint -p .",
+    "lint:fix": "yarn lint --fix",
+    "prebuild": "rimraf tmp dist coverage",
+    "build": "tsc -p tsconfig.build.json && rollup -c",
+    "postbuild": "rimraf tmp"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-typescript": "^7.6.0",
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "@semantic-release/changelog": "^3.0.4",
+    "@types/jest": "^24.0.18",
+    "@types/ramda": "^0.26.29",
+    "babel-jest": "^24.9.0",
+    "husky": "^3.0.9",
+    "jest": "^24.9.0",
+    "lint-staged": "^9.4.2",
+    "prettier": "1.18.2",
+    "pretty-quick": "^2.0.0",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.23.1",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-filesize": "^6.2.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.1.2",
+    "semantic-release": "^15.13.24",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "date-fns": "^2.4.1",
+    "ramda": "^0.26.1"
+  },
+  "keywords": [
+    "typescript",
+    "schema",
+    "json",
+    "convert",
+    "transform",
+    "typesafe"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged && lint-staged",
+      "pre-push": "yarn run lint && yarn run test --bail",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "yarn run lint:fix --",
+      "git add",
+      "yarn run test --bail --findRelatedTests"
+    ]
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.ts",
+      "!<rootDir>/src/index.ts",
+      "!<rootDir>/src/__tests__/**",
+      "!<rootDir>/src/utils/**"
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+version: 2
+
+defaults: &defaults
+  docker:
+    - image: circleci/node:latest
+  working_directory: ~/repo
+
+jobs:
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: dependencies-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Install dependencies
+          command: yarn install
+
+      - save_cache:
+          key: dependencies-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+
+      - run:
+          name: Unit Testing
+          command: yarn run test --coverage
+
+      - run:
+          name: Upload coverage to codecov
+          command: bash <(curl -s https://codecov.io/bash)
+
+      - run:
+          name: Lint
+          command: yarn run lint
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
+  build:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - run:
+          name: Build distributable bundles and type definitions
+          command: yarn run build
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
+  release:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - run:
+          name: Semantic releasing
+          command: npx semantic-release
+
+workflows:
+  version: 2
+  test-build-release:
+    jobs:
+      - test:
+      - build:
+          requires:
+            - test
+      - release:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master

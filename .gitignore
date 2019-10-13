@@ -1,0 +1,23 @@
+# IDEs and editors
+.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode
+
+# Dependency directories
+node_modules
+
+# Compiled output
+dist
+tmp
+
+# Coverage output
+coverage
+
+# System Files
+.DS_Store
+Thumbs.db

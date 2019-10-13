@@ -1,0 +1,40 @@
+{
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-standard",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "array-type": [true, "array"],
+    "arrow-return-shorthand": [true, "multiline"],
+    "curly": true,
+    "interface-name": [true, "never-prefix"],
+    "no-any": false,
+    "no-console": [true, "log"],
+    "no-default-export": true,
+    "no-duplicate-variable": [true, "check-parameters"],
+    "no-inferrable-types": true,
+    "no-namespace": [true, "allow-declarations"],
+    "no-unused-expression": true,
+    "only-arrow-functions": true,
+    "strict-type-predicates": false,
+    "switch-default": true,
+    "variable-name": [
+      true,
+      "check-format",
+      "ban-keywords",
+      "require-const-for-all-caps"
+    ],
+    "interface-over-type-literal": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "case-insensitive",
+        "grouped-imports": true,
+        "named-imports-order": "lowercase-first",
+        "module-source-path": "full"
+      }
+    ]
+  }
+}
