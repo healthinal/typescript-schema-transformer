@@ -8,7 +8,7 @@ import {
 } from './types';
 import { isString } from './utils';
 
-const validationRemarksToStrings = (
+export const validationRemarksToStrings = (
   validationRemarks: ValidationRemarks,
   objectKeys: readonly string[] = []
 ): readonly string[] =>
