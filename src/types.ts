@@ -2,9 +2,6 @@
 
 export const objectValidationRemarkKey = Symbol();
 
-export type ValidationRemarksIndexType =
-  | string
-  | typeof objectValidationRemarkKey;
 export type ValidationRemarks =
   | string
   | {

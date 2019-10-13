@@ -1,11 +1,7 @@
 import { forEach, join, keys, reduce } from 'ramda';
 
 import { hasNoValidationRemarks } from './helper';
-import {
-  objectValidationRemarkKey,
-  ValidationRemarks,
-  ValidationRemarksIndexType,
-} from './types';
+import { objectValidationRemarkKey, ValidationRemarks } from './types';
 import { isString } from './utils';
 
 export const validationRemarksToStrings = (
@@ -22,21 +18,15 @@ export const validationRemarksToStrings = (
             )
           : []),
         ...reduce(
-          (remarksAsStrings, remarksObjectKey: ValidationRemarksIndexType) => [
+          (remarksAsStrings, remarksObjectKey) => [
             ...remarksAsStrings,
-            ...(remarksObjectKey === objectValidationRemarkKey
-              ? [
-                  `${join('.', objectKeys)}: ${
-                    validationRemarks[remarksObjectKey]
-                  }`,
-                ]
-              : validationRemarksToStrings(
-                  validationRemarks[remarksObjectKey],
-                  [...objectKeys, remarksObjectKey]
-                )),
+            ...validationRemarksToStrings(validationRemarks[remarksObjectKey], [
+              ...objectKeys,
+              remarksObjectKey,
+            ]),
           ],
           [] as readonly string[],
-          keys(validationRemarks) as ValidationRemarksIndexType[]
+          keys(validationRemarks) as readonly string[] // keys() does not return Symbols used as key
         ),
       ];
 
