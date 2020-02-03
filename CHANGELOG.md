@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+## [1.2.1](https://github.com/healthinal/typescript-schema-transformer/compare/v1.2.0...v1.2.1) (2020-02-03)
+
+
+### Bug Fixes
+
+* **package:** update ramda to version 0.27.0 ([3e53722](https://github.com/healthinal/typescript-schema-transformer/commit/3e537222d82ca2cce8fa58a5adbba484eb671f1f))
+
 # [1.2.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.1.0...v1.2.0) (2019-10-13)
 
 
