@@ -1,4 +1,4 @@
-# Typescript Schema Transformer
+# TypeScript Schema Transformer
 
 Ensure your typings match the runtime object structures.
 
@@ -7,8 +7,18 @@ Ensure your typings match the runtime object structures.
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Greenkeeper badge](https://badges.greenkeeper.io/healthinal/typescript-schema-transformer.svg)](https://greenkeeper.io/)
+[![npm version](https://img.shields.io/npm/v/@healthinal/typescript-schema-transformer.svg?label=npm&style=flat-square)](https://www.npmjs.com/package/@healthinal/typescript-schema-transformer)
 
 ```typescript
+import {
+  addStaticValueSchema,
+  ObjectTransformationSchema,
+  optionalStringSchema,
+  requiredBooleanSchema,
+  requiredStringSchema,
+  transformWithSchema,
+} from '@healthinal/typescript-schema-transformer';
+
 enum AinurType {
   VALAR = 'VALAR',
   MAIAR = 'MAIAR',
@@ -63,6 +73,475 @@ actually match the runtime values.
 
 - Validate an object according to a JSON Schema (use something like [Ajv](https://github.com/epoberezkin/ajv))
 - Support preservation of prototype information
+
+## Installation
+
+```shell script
+# Yarn
+yarn add @healthinal/typescript-schema-transformer
+
+# npm
+npm install @healthinal/typescript-schema-transformer
+```
+
+Use the package with
+
+```typescript
+import { transformWithSchema } from '@healthinal/typescript-schema-transformer';
+```
+
+## API
+
+### Transform
+
+#### transformWithSchema(schema: ObjectTransformationSchema<T>, objectToTransform: unknown): [T, ValidationRemarks]
+
+This is the main function to call from this library.
+The first argument is a schema which describes the type T and how a value can be transformed to this type.
+The second argument is the actual object which can have any type (therefore the unknown type).
+The function returns a tuple containing the transformed object which is assured to be of type T and a validation remarks object.
+
+```typescript
+const [valar, validationRemarks] = transformWithSchema(valarSchema, {
+  name: 'Varda',
+});
+```
+
+### Validation remarks
+
+As seen above, `transformWithSchema` returns a tuple with the transformed object and a so called validation remarks object.
+You might wonder what the type of ValidationRemarks is so there you go:
+
+```typescript
+const objectValidationRemarkKey = Symbol();
+type ValidationRemarks =
+  | string
+  | {
+      [objectValidationRemarkKey]?: string;
+      [key: string]: ValidationRemarks;
+    };
+```
+
+It is basically a data structure which can hold the results of the validation according to the structure of the validation schema.
+For further usage the following functions can be used:
+
+#### logWarningIfValidationRemarksArePresent(transformationName: string, validationRemarks: ValidationRemarks): void
+
+_WARNING: This function is NOT pure!!!_
+
+This is a utility function which can be used to log validation remarks to the console.
+This is useful if you want to work with whatever the transformation returns but still want to be able to see if something was not quite right.
+
+```typescript
+const [_, validationRemarks] = transformWithSchema(valarSchema, {
+  name: 'Varda',
+});
+logWarningIfValidationRemarksArePresent(validationRemarks);
+```
+
+#### validationRemarksToStrings(validationRemarks: ValidationRemarks): string[]
+
+Transforms the validation remarks to a list of strings containing the remarks in a human readable format.
+
+```typescript
+const [_, validationRemarks] = transformWithSchema(valarSchema, {
+  name: 'Varda',
+});
+const remarksAsStrings = validationRemarksToStrings(validationRemarks);
+```
+
+#### hasNoValidationRemarks(validationRemarks: ValidationRemarks): boolean
+
+Checks if there were no validation remarks.
+If this function returns true, the transformation process did not change anything.
+
+```typescript
+const [_, validationRemarks] = transformWithSchema(valarSchema, {
+  name: 'Varda',
+});
+if (hasNoValidationRemarks(validationRemarks)) {
+  // ...
+}
+```
+
+### Schema
+
+To be able to transform an object a schema describing the transformation has to exist for a type.
+The typical process is to create a schema constant of the type `ObjectTransformationSchema<YourType>` which will help to create a correct schema for the type.
+Your IDE should also be able to help with autocompletion in this process.
+
+#### Object schema
+
+The root of a schema is always a object schema.
+It is used to transform an object literal with zero to n (finite) keys.
+The values of the properties are object, array or value schemas.
+The used schemas have to match the passed type (referenced in ObjectTransformationSchema, TypeScript should enforce this).
+
+Imagine a value of the following type should be transformed:
+
+```typescript
+type Valar = {
+  readonly name: string;
+  readonly domain?: string;
+  readonly isFemale: boolean;
+};
+```
+
+There are several possible object schemas which will result in different transformations, but all will ensure that the returned value is actually of type `Valar`.
+
+Example 1:
+
+```typescript
+const valarSchema: ObjectTransformationSchema<Valar> = {
+  name: requiredStringSchema(),
+  domain: optionalStringSchema(),
+  isFemale: requiredBooleanSchema(),
+};
+```
+
+This is the most basic schema which will use the predefined default values.
+
+Example 2:
+
+```typescript
+const valarSchema: ObjectTransformationSchema<Valar> = {
+  name: requiredStringSchema('no name available'),
+  domain: requiredStringSchema(),
+  isFemale: requiredBooleanSchema(),
+};
+```
+
+In this example the default value of the name has been changed, meaning that a non-string value in the name property (or no name property at all) will result
+in the value 'no name available' instead of an empty string (which is the predefined default value).
+The transformation of the domain has been changed too.
+Since the domain property allows undefined and strings, the requiredStringSchema which ensures the value to be a string is valid too because it enforces
+a subset of the type domain requires.
+
+Example 3 (DOES NOT WORK):
+
+```typescript
+// NOT VALID
+const valarSchema: ObjectTransformationSchema<Valar> = {
+  name: optionalStringSchema(),
+  domain: optionalNumberSchema(),
+  isFemale: requiredNumberSchema(),
+};
+```
+
+The example above does not work because the property name requires a string and not `string | undefined` and the domain as well as the isFemale property cannot hold a number.
+This is enforced using TypeScript so you should not be able to create a wrong schema on accident (on purpose this is of course possible).
+
+#### Array schema
+
+To transform an object which has a property containing an array you need an array schema.
+It contains another schema which will be used to transform all elements of the array.
+
+Example:
+
+```typescript
+type Maiar = {
+  readonly name: string;
+  readonly enemies: readonly string[];
+};
+
+const maiarSchema: ObjectTransformationSchema<Maiar> = {
+  name: requiredStringSchema(),
+  enemies: [requiredStringSchema()],
+};
+```
+
+In the example above you can see that an array schema is a simple array containing a single item which is the transformation schema for the
+elements of the array.
+
+<!--
+#### requiredStringSchema(defaultValue?: string): ValueTransformationSchema<string>
+
+#### optionalStringSchema(): ValueTransformationSchema<string>
+
+#### requiredNumberSchema(defaultValue?: number): ValueTransformationSchema<number>
+
+#### optionalNumberSchema(): ValueTransformationSchema<number>
+
+#### requiredBooleanSchema(defaultValue?: boolean): ValueTransformationSchema<boolean>
+
+#### optionalBooleanSchema(): ValueTransformationSchema<boolean>
+
+#### requiredDateSchema(defaultValue?: string): ValueTransformationSchema<string>
+
+#### requiredTimeSchema(defaultValue?: string): ValueTransformationSchema<string>
+
+#### requiredIsoDateTimeSchema(defaultValue?: string): ValueTransformationSchema<string>
+
+#### optionalColorStringSchema(): ValueTransformationSchema<string>
+
+#### requiredEnumSchema(enumValues: T[], defaultValue?: T): ValueTransformationSchema<T>
+
+#### staticValueSchema(value: T): ValueTransformationSchema<T>
+
+#### addStaticValueSchema(value: T): ValueTransformationSchema<T>
+
+#### noTransformationSchema: ValueTransformationSchema<any>
+
+#### Union
+
+#### Recursion
+
+### Custom value transformations
+
+#### getValidationRemark
+-->
+
+## Example transformations
+
+The following examples should you understand what the transformation actually does.
+If you need more examples, feel free to head over to the [test suite](https://github.com/healthinal/typescript-schema-transformer/tree/master/src/__tests__) containing many more examples.
+
+The examples assume a basic transformation like this:
+
+```typescript
+const schema: ObjectTransformationSchema<SomeType> = {
+  // ...
+};
+const [output] = transformWithSchema(schema, input);
+```
+
+The corresponding type will be omitted in the examples because it can be derived from the schema.
+Accordingly the following schema...
+
+```typescript
+const schema: ObjectTransformationSchema<SomeType> = {
+  foo: requiredStringSchema(),
+  bar: [requiredBooleanSchema()],
+};
+```
+
+...would derive the following type:
+
+```typescript
+type SomeType = {
+  readonly foo: string;
+  readonly bar: readonly boolean[];
+};
+```
+
+<table>
+    <tr>
+        <th>schema</th>
+        <th>input</th>
+        <th>output</th>
+        <th>No warnings</th>
+    </tr>
+<tr>
+<td rowspan="4">
+
+```typescript
+const schema = {
+  type: addStaticValueSchema(AinurType.VALAR),
+  name: requiredStringSchema(),
+  domain: optionalStringSchema(),
+  isFemale: requiredBooleanSchema(true),
+};
+```
+
+</td>
+<td>
+
+```typescript
+const input = {
+  type: 'VALAR',
+  name: 'Varda',
+  domain: 'Stars',
+  isFemale: true,
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  type: 'VALAR',
+  name: 'Varda',
+  domain: 'Stars',
+  isFemale: true,
+};
+```
+
+</td>
+<td>:white_check_mark:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {
+  name: 'Varda',
+  domain: null,
+  isFemale: true,
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  type: 'VALAR',
+  name: 'Varda',
+  domain: undefined,
+  isFemale: true,
+};
+```
+
+</td>
+<td>:white_check_mark:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  type: 'VALAR',
+  name: '',
+  domain: undefined,
+  isFemale: true,
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {
+  type: 'MAIAR',
+  name: 123,
+  domain: null,
+  isFemale: false,
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  type: 'VALAR',
+  name: '',
+  domain: undefined,
+  isFemale: false,
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+<tr>
+<td rowspan="2">
+
+```typescript
+const schema = {
+  name: requiredStringSchema(),
+  enemies: [requiredStringSchema()],
+  friends: [optionalStringSchema()],
+  rings: [
+    {
+      name: requiredStringSchema(),
+      gem: optionalStringSchema(),
+    },
+  ],
+};
+```
+
+</td>
+<td>
+
+```typescript
+const input = {
+  name: 'Gandalf',
+  enemies: ['Sauron', 'Saruman'],
+  friends: ['Frodo', undefined, null, 'Aragorn'],
+  rings: [
+    {
+      name: 'Narya',
+      gem: 'Ruby',
+    },
+  ],
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  name: 'Gandalf',
+  enemies: ['Sauron', 'Saruman'],
+  friends: ['Frodo', undefined, undefined, 'Aragorn'],
+  rings: [
+    {
+      name: 'Narya',
+      gem: 'Ruby',
+    },
+  ],
+};
+```
+
+</td>
+<td>:white_check_mark:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {
+  name: 'Gandalf',
+  enemies: ['Sauron', undefined, true],
+  friends: 'Frodo',
+  rings: [
+    false,
+    {
+      name: 'Narya',
+      gem: 'Ruby',
+    },
+  ],
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  name: 'Gandalf',
+  enemies: ['Sauron', '', ''],
+  friends: [],
+  rings: [
+    {
+      name: '',
+      gem: undefined,
+    },
+    {
+      name: 'Narya',
+      gem: 'Ruby',
+    },
+  ],
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+</table>
 
 ## Inspiration
 
