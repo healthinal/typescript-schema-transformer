@@ -197,6 +197,16 @@ describe('requiredDateSchema()', () => {
   });
 
   assert({
+    given: 'invalid date',
+    should: 'return default value and validation remark',
+    actual: () => requiredDateSchema()('2019-02-30'),
+    expected: [
+      '0001-01-01',
+      getValidationRemark('date', '2019-02-30', '0001-01-01'),
+    ],
+  });
+
+  assert({
     given: 'a string not in correct format',
     should: 'return default value and validation remark',
     actual: () => requiredDateSchema()('foo'),
@@ -234,6 +244,20 @@ describe('requiredTimeSchema()', () => {
     should: 'return default value and validation remark',
     actual: () => requiredTimeSchema()(undefined),
     expected: ['00:00:00', getValidationRemark('time', undefined, '00:00:00')],
+  });
+
+  assert({
+    given: 'invalid time',
+    should: 'return default value and validation remark',
+    actual: () => requiredTimeSchema()('22:45:70'),
+    expected: ['00:00:00', getValidationRemark('time', '22:45:70', '00:00:00')],
+  });
+
+  assert({
+    given: 'invalid time (midnight)',
+    should: 'return default value and validation remark',
+    actual: () => requiredTimeSchema()('24:00:00'),
+    expected: ['00:00:00', getValidationRemark('time', '24:00:00', '00:00:00')],
   });
 
   assert({

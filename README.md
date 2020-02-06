@@ -253,36 +253,62 @@ const maiarSchema: ObjectTransformationSchema<Maiar> = {
 In the example above you can see that an array schema is a simple array containing a single item which is the transformation schema for the
 elements of the array.
 
+#### Value schema
+
+Value schemas can be used to transform primitive values like strings, booleans and numbers.
+Generally there are two types of value transformers: required and optional.
+Required transformers always ensure the value to be of the specific type while optional transformers allow undefined values (null will be transformed to undefined too).
+Required transformers allow the default value to be overridden, otherwise the predefined default value will be used (e. g. an empty string for strings or 0 for numbers).
+
+##### requiredStringSchema(defaultValue?: string): ValueTransformationSchema<string>
+
+##### optionalStringSchema(): ValueTransformationSchema<string | undefined>
+
+##### requiredNumberSchema(defaultValue?: number): ValueTransformationSchema<number>
+
+##### optionalNumberSchema(): ValueTransformationSchema<number | undefined>
+
+##### requiredBooleanSchema(defaultValue?: boolean): ValueTransformationSchema<boolean>
+
+##### optionalBooleanSchema(): ValueTransformationSchema<boolean | undefined>
+
+##### requiredDateSchema(defaultValue?: string): ValueTransformationSchema<string>
+
+This ensures the string to be a valid date of the format YYYY-MM-DD.
+It does not only check the format but also if it is a real date (e. g. 2019-02-30 is not a valid date).
+
+##### requiredTimeSchema(defaultValue?: string): ValueTransformationSchema<string>
+
+This ensures the string to be a valid time of the format hh:mm:ss.
+It does not only check the format but also if it is a real time (e. g. 22:45:70 is not a valid time).
+
+##### requiredIsoDateTimeSchema(defaultValue?: string): ValueTransformationSchema<string>
+
+Does the same checks as `requiredDateSchema` and `requiredTimeSchema` but with the format YYYY-MM-DDThh:mm:ss (e. g. 2019-02-03T13:59:12).
+
+##### optionalColorStringSchema(): ValueTransformationSchema<string | undefined>
+
+Checks if the string is a valid hex color (e. g. #ffEA99).
+
+##### requiredEnumSchema(enumValues: T[], defaultValue?: T): ValueTransformationSchema<T>
+
+This transformer schema can be used to enforce a value to be one of a list of values, typically from an enum.
+See the examples [below](https://github.com/healthinal/typescript-schema-transformer#example-transformations) for more information.
+
+##### staticValueSchema(value: T): ValueTransformationSchema<T>
+
+Checks if a value matches a static value and raises a remark if it does not.
+Without other elements this may seem quite odd but with union transformers it can be really useful to create [discriminated unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions).
+
+##### addStaticValueSchema(value: T): ValueTransformationSchema<T>
+
+This is basically the same as `staticValueSchema` but does not raise a remark if the source object does not contain the value.
+It is useful to add an attribute for discriminated unions if the source (e. g. the API) does not deliver such a value.
+
 <!--
-#### requiredStringSchema(defaultValue?: string): ValueTransformationSchema<string>
-
-#### optionalStringSchema(): ValueTransformationSchema<string>
-
-#### requiredNumberSchema(defaultValue?: number): ValueTransformationSchema<number>
-
-#### optionalNumberSchema(): ValueTransformationSchema<number>
-
-#### requiredBooleanSchema(defaultValue?: boolean): ValueTransformationSchema<boolean>
-
-#### optionalBooleanSchema(): ValueTransformationSchema<boolean>
-
-#### requiredDateSchema(defaultValue?: string): ValueTransformationSchema<string>
-
-#### requiredTimeSchema(defaultValue?: string): ValueTransformationSchema<string>
-
-#### requiredIsoDateTimeSchema(defaultValue?: string): ValueTransformationSchema<string>
-
-#### optionalColorStringSchema(): ValueTransformationSchema<string>
-
-#### requiredEnumSchema(enumValues: T[], defaultValue?: T): ValueTransformationSchema<T>
-
-#### staticValueSchema(value: T): ValueTransformationSchema<T>
-
-#### addStaticValueSchema(value: T): ValueTransformationSchema<T>
+#### Union
 
 #### noTransformationSchema: ValueTransformationSchema<any>
-
-#### Union
 
 #### Recursion
 
@@ -535,6 +561,265 @@ const output = {
       gem: 'Ruby',
     },
   ],
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+<tr>
+<td rowspan="3">
+
+```typescript
+const schema = {
+  a: requiredStringSchema(),
+  b: optionalStringSchema(),
+  c: requiredNumberSchema(),
+  d: optionalNumberSchema(),
+  e: requiredBooleanSchema(),
+  f: optionalBooleanSchema(),
+  g: requiredDateSchema(),
+  h: requiredTimeSchema(),
+  i: requiredIsoDateTimeSchema(),
+  j: optionalColorStringSchema(),
+};
+```
+
+</td>
+<td>
+
+```typescript
+const input = {
+  a: 'a',
+  b: undefined,
+  c: 2,
+  d: undefined,
+  e: true,
+  f: undefined,
+  g: '2020-02-02',
+  h: '14:55:12',
+  i: '2020-02-02T14:55:12',
+  j: undefined,
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  a: 'a',
+  b: undefined,
+  c: 2,
+  d: undefined,
+  e: true,
+  f: undefined,
+  g: '2020-02-02',
+  h: '14:55:12',
+  i: '2020-02-02T14:55:12',
+  j: undefined,
+};
+```
+
+</td>
+<td>:white_check_mark:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {
+  a: 'a',
+  b: 'b',
+  c: 2,
+  d: 3,
+  e: true,
+  f: false,
+  g: '2020-02-02',
+  h: '14:55:12',
+  i: '2020-02-02T14:55:12',
+  j: '#fe45AE',
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  a: 'a',
+  b: 'b',
+  c: 2,
+  d: 3,
+  e: true,
+  f: false,
+  g: '2020-02-02',
+  h: '14:55:12',
+  i: '2020-02-02T14:55:12',
+  j: '#fe45AE',
+};
+```
+
+</td>
+<td>:white_check_mark:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  a: '',
+  b: undefined,
+  c: 0,
+  d: undefined,
+  e: false,
+  f: undefined,
+  g: '0001-01-01',
+  h: '00:00:00',
+  i: '0001-01-01T00:00:00',
+  j: undefined,
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const schema = {
+  a: requiredStringSchema('default'),
+  b: requiredNumberSchema(42),
+  c: requiredBooleanSchema(true),
+  d: requiredDateSchema('2019-01-01'),
+  e: requiredTimeSchema('14:00:00'),
+  f: requiredIsoDateTimeSchema('2019-01-01T14:00:00'),
+};
+```
+
+</td>
+<td>
+
+```typescript
+const input = {};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  a: 'default',
+  b: 42,
+  c: true,
+  d: '2019-01-01',
+  e: '14:00:00',
+  f: '2019-01-01T14:00:00',
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+<tr>
+<td rowspan="2">
+
+```typescript
+const values = <T extends object, K extends keyof T>(obj: T): T[K][] =>
+  Object.keys(obj).map(k => (obj as any)[k]);
+
+enum ElfType {
+  VANYAR = 'VANYAR',
+  NOLDOR = 'NOLDOR',
+  TELERI = 'TELERI',
+}
+
+const schema = {
+  name: requiredStringSchema(),
+  type: requiredEnumSchema(values(ElfType)),
+};
+```
+
+</td>
+<td>
+
+```typescript
+const input = {
+  name: 'Galadriel',
+  type: ElfType.NOLDOR,
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  name: 'Galadriel',
+  type: ElfType.NOLDOR,
+};
+```
+
+</td>
+<td>:white_check_mark:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {
+  name: 'Ingwe',
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  name: 'Ingwe',
+  type: ElfType.VANYAR,
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const schema = {
+  name: requiredStringSchema(),
+  type: requiredEnumSchema(values(ElfType), ElfType.TELERI),
+};
+```
+
+</td>
+<td>
+
+```typescript
+const input = {
+  name: 'Elwe',
+  type: 'ELVISH',
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  name: 'Elwe',
+  type: ElfType.TELERI,
 };
 ```
 

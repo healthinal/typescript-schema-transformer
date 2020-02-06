@@ -1,8 +1,16 @@
 import {
   addStaticValueSchema,
+  optionalBooleanSchema,
+  optionalColorStringSchema,
+  optionalNumberSchema,
   optionalStringSchema,
   requiredBooleanSchema,
+  requiredDateSchema,
+  requiredEnumSchema,
+  requiredIsoDateTimeSchema,
+  requiredNumberSchema,
   requiredStringSchema,
+  requiredTimeSchema,
   transformWithSchema,
   ObjectTransformationSchema,
 } from '..';
@@ -188,6 +196,187 @@ describe('examples', () => {
             gem: 'Ruby',
           },
         ],
+      },
+    });
+  }
+
+  {
+    const schema = {
+      a: requiredStringSchema(),
+      b: optionalStringSchema(),
+      c: requiredNumberSchema(),
+      d: optionalNumberSchema(),
+      e: requiredBooleanSchema(),
+      f: optionalBooleanSchema(),
+      g: requiredDateSchema(),
+      h: requiredTimeSchema(),
+      i: requiredIsoDateTimeSchema(),
+      j: optionalColorStringSchema(),
+    };
+
+    assert({
+      given: 'example 7',
+      should: 'be correct',
+      actual: () =>
+        transformWithSchema(schema, {
+          a: 'a',
+          b: undefined,
+          c: 2,
+          d: undefined,
+          e: true,
+          f: undefined,
+          g: '2020-02-02',
+          h: '14:55:12',
+          i: '2020-02-02T14:55:12',
+          j: undefined,
+        })[0],
+      expected: {
+        a: 'a',
+        b: undefined,
+        c: 2,
+        d: undefined,
+        e: true,
+        f: undefined,
+        g: '2020-02-02',
+        h: '14:55:12',
+        i: '2020-02-02T14:55:12',
+        j: undefined,
+      },
+    });
+
+    assert({
+      given: 'example 8',
+      should: 'be correct',
+      actual: () =>
+        transformWithSchema(schema, {
+          a: 'a',
+          b: 'b',
+          c: 2,
+          d: 3,
+          e: true,
+          f: false,
+          g: '2020-02-02',
+          h: '14:55:12',
+          i: '2020-02-02T14:55:12',
+          j: '#fe45AE',
+        })[0],
+      expected: {
+        a: 'a',
+        b: 'b',
+        c: 2,
+        d: 3,
+        e: true,
+        f: false,
+        g: '2020-02-02',
+        h: '14:55:12',
+        i: '2020-02-02T14:55:12',
+        j: '#fe45AE',
+      },
+    });
+
+    assert({
+      given: 'example 9',
+      should: 'be correct',
+      actual: () => transformWithSchema(schema, {})[0],
+      expected: {
+        a: '',
+        b: undefined,
+        c: 0,
+        d: undefined,
+        e: false,
+        f: undefined,
+        g: '0001-01-01',
+        h: '00:00:00',
+        i: '0001-01-01T00:00:00',
+        j: undefined,
+      },
+    });
+  }
+
+  assert({
+    given: 'example 10',
+    should: 'be correct',
+    actual: () =>
+      transformWithSchema(
+        {
+          a: requiredStringSchema('default'),
+          b: requiredNumberSchema(42),
+          c: requiredBooleanSchema(true),
+          d: requiredDateSchema('2019-01-01'),
+          e: requiredTimeSchema('14:00:00'),
+          f: requiredIsoDateTimeSchema('2019-01-01T14:00:00'),
+        },
+        {}
+      )[0],
+    expected: {
+      a: 'default',
+      b: 42,
+      c: true,
+      d: '2019-01-01',
+      e: '14:00:00',
+      f: '2019-01-01T14:00:00',
+    },
+  });
+
+  {
+    const values = <T extends object, K extends keyof T>(obj: T): T[K][] =>
+      Object.keys(obj).map(k => (obj as any)[k]);
+
+    enum ElfType {
+      VANYAR = 'VANYAR',
+      NOLDOR = 'NOLDOR',
+      TELERI = 'TELERI',
+    }
+
+    const schema = {
+      name: requiredStringSchema(),
+      type: requiredEnumSchema(values(ElfType)),
+    };
+
+    assert({
+      given: 'example 11',
+      should: 'be correct',
+      actual: () =>
+        transformWithSchema(schema, {
+          name: 'Galadriel',
+          type: ElfType.NOLDOR,
+        })[0],
+      expected: {
+        name: 'Galadriel',
+        type: ElfType.NOLDOR,
+      },
+    });
+
+    assert({
+      given: 'example 12',
+      should: 'be correct',
+      actual: () =>
+        transformWithSchema(schema, {
+          name: 'Ingwe',
+        })[0],
+      expected: {
+        name: 'Ingwe',
+        type: ElfType.VANYAR,
+      },
+    });
+
+    assert({
+      given: 'example 13',
+      should: 'be correct',
+      actual: () =>
+        transformWithSchema(
+          {
+            name: requiredStringSchema(),
+            type: requiredEnumSchema(values(ElfType), ElfType.TELERI),
+          },
+          {
+            name: 'Elwe',
+            type: 'ELVISH',
+          }
+        )[0],
+      expected: {
+        name: 'Elwe',
+        type: ElfType.TELERI,
       },
     });
   }
