@@ -602,4 +602,28 @@ describe('examples', () => {
       },
     });
   }
+
+  {
+    type Valar = {
+      readonly name: string;
+      readonly isFemale: boolean;
+    };
+
+    const valarSchema: ObjectTransformationSchema<Valar> = {
+      name: requiredStringSchema(),
+      isFemale: requiredBooleanSchema(true),
+    };
+
+    const transformValar = transformWithSchema(valarSchema);
+
+    assert({
+      given: 'curry example',
+      should: 'be correct',
+      actual: () => transformValar({ name: 'Varda', isFemale: true })[0],
+      expected: {
+        name: 'Varda',
+        isFemale: true,
+      },
+    });
+  }
 });

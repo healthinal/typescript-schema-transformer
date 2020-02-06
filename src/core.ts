@@ -1,4 +1,4 @@
-import { addIndex, has, isNil, keys, map, pipe, reduce } from 'ramda';
+import { addIndex, curry, has, isNil, keys, map, pipe, reduce } from 'ramda';
 
 import { DeepWithoutUnionTypes, ObjectTransformationSchema } from '.';
 import { getValidationRemark, hasNoValidationRemarks } from './helper';
@@ -95,45 +95,55 @@ const transformValueAccordingToSchema = (
     ? transformWithUnionTypeTransformationSchema(schema, value)
     : transformWithSchema(schema, value);
 
-export const transformWithSchema = <T>(
-  schema: ObjectTransformationSchema<T>,
-  objectToTransform: unknown
-): [DeepWithoutUnionTypes<T>, ValidationRemarks] =>
-  reduce(
-    ([transformedObject, validationRemarks], propertyName) =>
-      pipe(
-        () => [
-          schema[propertyName],
-          has(propertyName as string, objectToTransform || {})
-            ? (objectToTransform as any)[propertyName]
-            : undefined,
-        ],
-        ([propertyTransformer, propertyValue]) =>
-          transformValueAccordingToSchema(propertyTransformer, propertyValue),
-        ([transformedPropertyValue, validationRemarksOfProperty]) => [
-          {
-            ...transformedObject,
-            [propertyName]: transformedPropertyValue,
-          },
-          hasNoValidationRemarks(validationRemarksOfProperty)
-            ? validationRemarks
-            : {
-                ...validationRemarks,
-                [propertyName]: validationRemarksOfProperty,
-              },
-        ]
-      )() as [DeepWithoutUnionTypes<T>, object],
-    [
-      {} as DeepWithoutUnionTypes<T>,
-      isObject(objectToTransform) && !Array.isArray(objectToTransform)
-        ? {}
-        : {
-            [objectValidationRemarkKey]: getValidationRemark(
-              'object',
-              objectToTransform,
-              {}
-            ),
-          },
-    ],
-    keys(schema)
-  );
+export const transformWithSchema: {
+  <T>(schema: ObjectTransformationSchema<T>): (
+    objectToTransform: unknown
+  ) => [DeepWithoutUnionTypes<T>, ValidationRemarks];
+  <T>(schema: ObjectTransformationSchema<T>, objectToTransform: unknown): [
+    DeepWithoutUnionTypes<T>,
+    ValidationRemarks
+  ];
+} = curry(
+  <T>(
+    schema: ObjectTransformationSchema<T>,
+    objectToTransform: unknown
+  ): [DeepWithoutUnionTypes<T>, ValidationRemarks] =>
+    reduce(
+      ([transformedObject, validationRemarks], propertyName) =>
+        pipe(
+          () => [
+            schema[propertyName],
+            has(propertyName as string, objectToTransform || {})
+              ? (objectToTransform as any)[propertyName]
+              : undefined,
+          ],
+          ([propertyTransformer, propertyValue]) =>
+            transformValueAccordingToSchema(propertyTransformer, propertyValue),
+          ([transformedPropertyValue, validationRemarksOfProperty]) => [
+            {
+              ...transformedObject,
+              [propertyName]: transformedPropertyValue,
+            },
+            hasNoValidationRemarks(validationRemarksOfProperty)
+              ? validationRemarks
+              : {
+                  ...validationRemarks,
+                  [propertyName]: validationRemarksOfProperty,
+                },
+          ]
+        )() as [DeepWithoutUnionTypes<T>, object],
+      [
+        {} as DeepWithoutUnionTypes<T>,
+        isObject(objectToTransform) && !Array.isArray(objectToTransform)
+          ? {}
+          : {
+              [objectValidationRemarkKey]: getValidationRemark(
+                'object',
+                objectToTransform,
+                {}
+              ),
+            },
+      ],
+      keys(schema)
+    )
+) as any;

@@ -107,6 +107,29 @@ const [valar, validationRemarks] = transformWithSchema(valarSchema, {
 });
 ```
 
+`transformWithSchema` is curried which means you can easily create a function which is fixed on a specific schema.
+
+```typescript
+type Valar = {
+  readonly name: string;
+  readonly isFemale: boolean;
+};
+
+const valarSchema: ObjectTransformationSchema<Valar> = {
+  name: requiredStringSchema(),
+  isFemale: requiredBooleanSchema(true),
+};
+
+const transformValar = transformWithSchema(valarSchema);
+const [valar] = transformValar({ name: 'Varda', isFemale: true });
+/*
+valar = {
+  name: 'Varda',
+  isFemale: true,
+}
+*/
+```
+
 ### Validation remarks
 
 As seen above, `transformWithSchema` returns a tuple with the transformed object and a so called validation remarks object.
