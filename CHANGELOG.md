@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+# [1.3.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.2.1...v1.3.0) (2020-02-06)
+
+
+### Features
+
+* curry transformWithSchema ([d81a34f](https://github.com/healthinal/typescript-schema-transformer/commit/d81a34fcc8f40421a9cef486b3cdbca3ab3329b2))
+
 ## [1.2.1](https://github.com/healthinal/typescript-schema-transformer/compare/v1.2.0...v1.2.1) (2020-02-03)
 
 
