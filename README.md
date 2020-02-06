@@ -425,7 +425,7 @@ Sometimes data structures are nested up to a unknown depth.
 The features seen until now are not able to support this use case because the transformation schema is a finite data structure.
 It is possible to trick TypeScript into supporting this use case and `transformWithSchema` is able to handle it in most cases.
 
-**Caution: This can result in a infinite recursion if the input value is a infinite structure too!!!**
+**Caution: This can result in an infinite recursion if the input value is an infinite structure too!!!**
 
 Example of recursive schema:
 
@@ -447,11 +447,48 @@ schema.directories = [schema];
 As seen above it is necessary to create the schema in two steps.
 Since the schema in the first step is not valid we need to tell TypeScript to not check it with `as any`.
 
-<!--
-### Custom value transformations
+### Custom value transformation schemas
 
-#### getValidationRemark
--->
+It is possible to define your own value transformation schemas.
+There are two possibilities to do this.
+
+The first possibility is to simply implement the type of `ValueTransformationSchema`:
+
+```typescript
+type SupportedValueTypes = boolean | number | string | undefined;
+type ValueTransformationSchema<T extends SupportedValueTypes> = (
+  value: unknown
+) => [T, string | undefined];
+
+const evenNumberSchema: ValueTransformationSchema<number> = value =>
+  typeof value === 'number' && value % 2 === 0
+    ? [value, undefined]
+    : [0, value + ' is not a even number'];
+```
+
+`ValueTransformationSchema` is a simple function which gets the value to transform as an argument
+and returns a tuple with the final value and a validation remark (which is undefined if everything is ok).
+
+The other possibility is to use the predefined helpers
+`createValueTransformationSchema(type: string, defaultValue: T, isValid: (value: unknown) => boolean, shouldRaiseRemark?: (value: unknown) => boolean): ValueTransformationSchema<T>`
+and `createValueTransformationSchemaForOptionalValue(type: string, isValid: (value: unknown) => boolean): ValueTransformationSchema<T | undefined>`
+to create those functions.
+
+```typescript
+export const requiredEvenNumberSchema = createValueTransformationSchema<number>(
+  'even number',
+  0,
+  value => typeof value === 'number' && value % 2 === 0
+);
+
+export const optionalEvenNumberSchema = createValueTransformationSchemaForOptionalValue<
+  number
+>('even number', value => typeof value === 'number' && value % 2 === 0);
+```
+
+The type is only for the error message.
+In the required variant a default value has to be defined (in the optional variant this is always undefined).
+And most importantly a function has to be defined which checks if the value is valid according to the schema.
 
 ## Example transformations
 
@@ -1037,12 +1074,204 @@ const output = {
 </td>
 <td>:x:</td>
 </tr>
+<tr>
+<td>
+
+```typescript
+enum AinurType {
+  VALAR = 'VALAR',
+  MAIAR = 'MAIAR',
+}
+
+type Ainur = {
+  readonly type: AinurType;
+  readonly name: string;
+};
+
+type Valar = Ainur & {
+  readonly type: AinurType.VALAR;
+  readonly domain: string;
+};
+
+type Maiar = Ainur & {
+  readonly type: AinurType.MAIAR;
+  readonly hasRing: boolean;
+};
+
+type World = {
+  readonly name: string;
+  readonly ainur: readonly UnionType2<Valar, Maiar>[];
+};
+
+const ainurSchema: ObjectTransformationSchema<Ainur> = {
+  type: requiredEnumSchema(values(AinurType)),
+  name: requiredStringSchema(),
+};
+
+const valarSchema: ObjectTransformationSchema<Valar> = {
+  ...ainurSchema,
+  type: addStaticValueSchema(AinurType.VALAR),
+  domain: requiredStringSchema(),
+};
+
+const maiarSchema: ObjectTransformationSchema<Maiar> = {
+  ...ainurSchema,
+  type: addStaticValueSchema(AinurType.MAIAR),
+  hasRing: requiredBooleanSchema(),
+};
+
+const schema: ObjectTransformationSchema<World> = {
+  name: requiredStringSchema(),
+  ainur: [
+    createUnionTypeTransformationSchema<Ainur, Valar, Maiar>(
+      ainurSchema,
+      ({ type }) => (type === AinurType.VALAR ? valarSchema : maiarSchema)
+    ),
+  ],
+};
+```
+
+</td>
+<td>
+
+```typescript
+const input = {
+  name: 'Arda',
+  ainur: [
+    {
+      type: AinurType.VALAR,
+      name: 'Varda',
+      domain: 'Stars',
+    },
+    {
+      type: AinurType.MAIAR,
+      name: 'Gandalf',
+      hasRing: true,
+    },
+    {
+      name: 'Ulmo',
+      domain: 'Sea',
+    },
+    {
+      type: AinurType.MAIAR,
+      name: 'Melian',
+    },
+  ],
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  name: 'Arda',
+  ainur: [
+    {
+      type: AinurType.VALAR,
+      name: 'Varda',
+      domain: 'Stars',
+    },
+    {
+      type: AinurType.MAIAR,
+      name: 'Gandalf',
+      hasRing: true,
+    },
+    {
+      type: AinurType.VALAR,
+      name: 'Ulmo',
+      domain: 'Sea',
+    },
+    {
+      type: AinurType.MAIAR,
+      name: 'Melian',
+      hasRing: false,
+    },
+  ],
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+type File = { name: string };
+type Directory = { name: string; files: File[]; directories: Directory[] };
+const schema: ObjectTransformationSchema<Directory> = {
+  name: requiredStringSchema(),
+  files: [
+    {
+      name: requiredStringSchema(),
+    },
+  ],
+  directories: [] as any,
+};
+schema.directories = [schema];
+```
+
+</td>
+<td>
+
+```typescript
+const input = {
+  name: 'd1',
+  files: [{ name: 'f1' }, { name: 0 }],
+  directories: [
+    {
+      name: 'd1.1',
+      files: [{ name: 'f1' }, { name: 'f2' }],
+      directories: [],
+    },
+    {
+      name: 'd1.2',
+      files: [{ name: 'f1' }, { name: 0 }],
+      directories: [
+        {
+          name: 'd1.2.1',
+          files: [{ name: 'f1' }, { name: 0 }],
+          directories: [],
+        },
+      ],
+    },
+  ],
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  name: 'd1',
+  files: [{ name: 'f1' }, { name: '' }],
+  directories: [
+    {
+      name: 'd1.1',
+      files: [{ name: 'f1' }, { name: 'f2' }],
+      directories: [],
+    },
+    {
+      name: 'd1.2',
+      files: [{ name: 'f1' }, { name: '' }],
+      directories: [
+        {
+          name: 'd1.2.1',
+          files: [{ name: 'f1' }, { name: '' }],
+          directories: [],
+        },
+      ],
+    },
+  ],
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
 </table>
-<!--
-Union transformer examples
-Recursion examples
-Custom transformer examples
--->
 
 ## Inspiration
 

@@ -21,6 +21,9 @@ import {
 } from '..';
 import { assert } from '../utils';
 
+const values = <T extends object, K extends keyof T>(obj: T): T[K][] =>
+  Object.keys(obj).map(k => (obj as any)[k]);
+
 describe('examples', () => {
   {
     type SomeTypeSchemaDefinition = {
@@ -389,9 +392,6 @@ describe('examples', () => {
   });
 
   {
-    const values = <T extends object, K extends keyof T>(obj: T): T[K][] =>
-      Object.keys(obj).map(k => (obj as any)[k]);
-
     enum ElfType {
       VANYAR = 'VANYAR',
       NOLDOR = 'NOLDOR',
@@ -450,6 +450,7 @@ describe('examples', () => {
       },
     });
   }
+
   {
     const schema = {
       a: staticValueSchema(true),
@@ -490,6 +491,114 @@ describe('examples', () => {
       expected: {
         a: true,
         b: true,
+      },
+    });
+  }
+
+  {
+    enum AinurType {
+      VALAR = 'VALAR',
+      MAIAR = 'MAIAR',
+    }
+
+    type Ainur = {
+      readonly type: AinurType;
+      readonly name: string;
+    };
+
+    type Valar = Ainur & {
+      readonly type: AinurType.VALAR;
+      readonly domain: string;
+    };
+
+    type Maiar = Ainur & {
+      readonly type: AinurType.MAIAR;
+      readonly hasRing: boolean;
+    };
+
+    type World = {
+      readonly name: string;
+      readonly ainur: readonly UnionType2<Valar, Maiar>[];
+    };
+
+    const ainurSchema: ObjectTransformationSchema<Ainur> = {
+      type: requiredEnumSchema(values(AinurType)),
+      name: requiredStringSchema(),
+    };
+
+    const valarSchema: ObjectTransformationSchema<Valar> = {
+      ...ainurSchema,
+      type: addStaticValueSchema(AinurType.VALAR),
+      domain: requiredStringSchema(),
+    };
+
+    const maiarSchema: ObjectTransformationSchema<Maiar> = {
+      ...ainurSchema,
+      type: addStaticValueSchema(AinurType.MAIAR),
+      hasRing: requiredBooleanSchema(),
+    };
+
+    const worldSchema: ObjectTransformationSchema<World> = {
+      name: requiredStringSchema(),
+      ainur: [
+        createUnionTypeTransformationSchema<Ainur, Valar, Maiar>(
+          ainurSchema,
+          ({ type }) => (type === AinurType.VALAR ? valarSchema : maiarSchema)
+        ),
+      ],
+    };
+
+    assert({
+      given: 'example 17',
+      should: 'be correct',
+      actual: () =>
+        transformWithSchema(worldSchema, {
+          name: 'Arda',
+          ainur: [
+            {
+              type: AinurType.VALAR,
+              name: 'Varda',
+              domain: 'Stars',
+            },
+            {
+              type: AinurType.MAIAR,
+              name: 'Gandalf',
+              hasRing: true,
+            },
+            {
+              name: 'Ulmo',
+              domain: 'Sea',
+            },
+            {
+              type: AinurType.MAIAR,
+              name: 'Melian',
+            },
+          ],
+        })[0],
+      expected: {
+        name: 'Arda',
+        ainur: [
+          {
+            type: AinurType.VALAR,
+            name: 'Varda',
+            domain: 'Stars',
+          },
+          {
+            type: AinurType.MAIAR,
+            name: 'Gandalf',
+            hasRing: true,
+          },
+          {
+            type: AinurType.VALAR,
+            name: 'Ulmo',
+            domain: 'Sea',
+          },
+          {
+            type: AinurType.MAIAR,
+            name: 'Melian',
+            hasRing: false,
+          },
+        ],
       },
     });
   }
