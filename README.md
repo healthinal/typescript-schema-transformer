@@ -94,7 +94,7 @@ import { transformWithSchema } from '@healthinal/typescript-schema-transformer';
 
 ### Transform
 
-#### transformWithSchema(schema: ObjectTransformationSchema<T>, objectToTransform: unknown): [T, ValidationRemarks]
+#### transformWithSchema(schema: ObjectTransformationSchema\<T>, objectToTransform: unknown): [T, ValidationRemarks]
 
 This is the main function to call from this library.
 The first argument is a schema which describes the type T and how a value can be transformed to this type.
@@ -127,7 +127,7 @@ For further usage the following functions can be used:
 
 #### logWarningIfValidationRemarksArePresent(transformationName: string, validationRemarks: ValidationRemarks): void
 
-_WARNING: This function is NOT pure!!!_
+**WARNING: This function is NOT pure!!!**
 
 This is a utility function which can be used to log validation remarks to the console.
 This is useful if you want to work with whatever the transformation returns but still want to be able to see if something was not quite right.
@@ -260,29 +260,29 @@ Generally there are two types of value transformers: required and optional.
 Required transformers always ensure the value to be of the specific type while optional transformers allow undefined values (null will be transformed to undefined too).
 Required transformers allow the default value to be overridden, otherwise the predefined default value will be used (e. g. an empty string for strings or 0 for numbers).
 
-##### requiredStringSchema(defaultValue?: string): ValueTransformationSchema<string>
+##### requiredStringSchema(defaultValue?: string): ValueTransformationSchema\<string>
 
 ##### optionalStringSchema(): ValueTransformationSchema<string | undefined>
 
-##### requiredNumberSchema(defaultValue?: number): ValueTransformationSchema<number>
+##### requiredNumberSchema(defaultValue?: number): ValueTransformationSchema\<number>
 
 ##### optionalNumberSchema(): ValueTransformationSchema<number | undefined>
 
-##### requiredBooleanSchema(defaultValue?: boolean): ValueTransformationSchema<boolean>
+##### requiredBooleanSchema(defaultValue?: boolean): ValueTransformationSchema\<boolean>
 
 ##### optionalBooleanSchema(): ValueTransformationSchema<boolean | undefined>
 
-##### requiredDateSchema(defaultValue?: string): ValueTransformationSchema<string>
+##### requiredDateSchema(defaultValue?: string): ValueTransformationSchema\<string>
 
 This ensures the string to be a valid date of the format YYYY-MM-DD.
 It does not only check the format but also if it is a real date (e. g. 2019-02-30 is not a valid date).
 
-##### requiredTimeSchema(defaultValue?: string): ValueTransformationSchema<string>
+##### requiredTimeSchema(defaultValue?: string): ValueTransformationSchema\<string>
 
 This ensures the string to be a valid time of the format hh:mm:ss.
 It does not only check the format but also if it is a real time (e. g. 22:45:70 is not a valid time).
 
-##### requiredIsoDateTimeSchema(defaultValue?: string): ValueTransformationSchema<string>
+##### requiredIsoDateTimeSchema(defaultValue?: string): ValueTransformationSchema\<string>
 
 Does the same checks as `requiredDateSchema` and `requiredTimeSchema` but with the format YYYY-MM-DDThh:mm:ss (e. g. 2019-02-03T13:59:12).
 
@@ -290,28 +290,164 @@ Does the same checks as `requiredDateSchema` and `requiredTimeSchema` but with t
 
 Checks if the string is a valid hex color (e. g. #ffEA99).
 
-##### requiredEnumSchema(enumValues: T[], defaultValue?: T): ValueTransformationSchema<T>
+##### requiredEnumSchema(enumValues: T[], defaultValue?: T): ValueTransformationSchema\<T>
 
 This transformer schema can be used to enforce a value to be one of a list of values, typically from an enum.
 See the examples [below](https://github.com/healthinal/typescript-schema-transformer#example-transformations) for more information.
 
-##### staticValueSchema(value: T): ValueTransformationSchema<T>
+##### staticValueSchema(value: T): ValueTransformationSchema\<T>
 
 Checks if a value matches a static value and raises a remark if it does not.
 Without other elements this may seem quite odd but with union transformers it can be really useful to create [discriminated unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions).
 
-##### addStaticValueSchema(value: T): ValueTransformationSchema<T>
+##### addStaticValueSchema(value: T): ValueTransformationSchema\<T>
 
 This is basically the same as `staticValueSchema` but does not raise a remark if the source object does not contain the value.
 It is useful to add an attribute for discriminated unions if the source (e. g. the API) does not deliver such a value.
 
-<!--
 #### Union
 
-#### noTransformationSchema: ValueTransformationSchema<any>
+Quite often, it is necessary to choose a transformation schema dynamically, e. g. if you receive a list of polymorphic objects which do not share every property.
+To support such use cases this library has a feature called union transformers.
+The basic idea is to have some optional prior transformation and then decide based on the data you receive which schema to apply.
+
+Example:
+
+```typescript
+type Color = { red: number; green: number; blue: number };
+const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
+  color: createUnionTypeTransformationSchema<any, string | undefined, Color>(
+    noTransformationSchema,
+    base =>
+      typeof base === 'object'
+        ? {
+            red: requiredNumberSchema(),
+            green: requiredNumberSchema(),
+            blue: requiredNumberSchema(),
+          }
+        : optionalColorStringSchema()
+  ),
+};
+
+const [output1] = transformWithSchema(schema, {
+  color: '#ffffff',
+});
+const [output2] = transformWithSchema(schema, {
+  color: {
+    red: 255,
+    green: 255,
+    blue: 255,
+  },
+});
+const [output3] = transformWithSchema(schema, {
+  color: true,
+});
+
+/*
+output1 = { color: '#ffffff' }
+output2 = { color: { red: 255, green: 255, blue: 255 } }
+output3 = { color: undefined }
+*/
+```
+
+The example above uses the function `createUnionTypeTransformationSchema(baseTransformationSchema, result => specificTransformationSchema)`
+to transform objects containing a color field, which can either hold a color string or an object with three numeric values representing a color.
+The type of `createUnionTypeTransformationSchema` is quite verbose so it is omitted here (you can see it [here](https://github.com/healthinal/typescript-schema-transformer/blob/master/src/union-type-transformation-schema.ts#L15)).
+For now, it is only important to remember that the first argument can do some transformation prior to the decision
+(this step can be omitted by using the `noTransformationSchema: ValueTransformationSchema\<any>` schema which leaves every value as it is)
+and the second argument is a function which receives the base transformed value and returns the transformation schema
+which is then actually used in the transformation.
+The type parameters of `createUnionTypeTransformationSchema` are quite important because they determine the possible results of the transformation.
+The first parameter is the result of the base transformation (in the example above `any` because of the `noTransformationSchema`).
+All type parameters after the first one are possible types of specific transformation schemas.
+In the example above it is possible to return a schema which can transform a value of the type `string | undefined` or `Color`.
+If we would add a forth type parameter of `boolean` it would be possible to return a `requiredBooleanSchema` as the specific transformation schema.
+
+_Side note: Ideally the type parameters of `createUnionTypeTransformationSchema` would be variadic but TypeScript does not support this. Therefore it is
+currently only possible to have nine additional parameters. This should be sufficient for most use cases.
+This issue is the reason there is a different type for each arity of the types `UnionType2`, `UnionType3`, ..., `UnionType9` (see below)._
+
+In the example above you might wonder what `SomeTypeSchemaDefinition` looks like. Ideally it would look like this:
+
+```typescript
+// DOES NOT WORK WITH THE SCHEMA ABOVE
+type SomeTypeSchemaDefinition = {
+  readonly color: (string | undefined) | Color;
+};
+```
+
+The issue with this type definition is that it is almost impossible to correctly split union types automatically.
+You will encounter issues like `boolean` being split into `true | false`.
+Therefore it is required to give the schema a hint which parts a union consists of.
+You can do this like this:
+
+```typescript
+type SomeTypeSchemaDefinition = {
+  readonly color: UnionType2<string | undefined, Color>;
+};
+```
+
+If you now create a schema with `ObjectTransformationSchema<SomeTypeSchemaDefinition>` you will be forced to use a
+union transformer which handles those two cases with `createUnionTypeTransformationSchema`.
+
+With this solution one new issue arises: The type `SomeType` should actually contain a TypeScript union and not the custom type `UnionType2`.
+One possibility would be to create `SomeTypeSchemaDefinition` (containing `UnionType2<string | undefined, Color>`) as well
+as `SomeType` (containing the union `(string | undefined) | Color`) manually.
+But this would be very repetitive and `SomeType` can be calculated easily.
+To solve this issue there is the type helper `DeepWithoutUnionTypes` which removes all `UnionTypeX` and replaces them
+with the matching union type.
+
+The following example shows how this could be used with the other parts:
+
+```typescript
+type SomeTypeSchemaDefinition = {
+  readonly title: UnionType2<string, false>;
+};
+type SomeType = DeepWithoutUnionTypes<SomeTypeSchemaDefinition>;
+
+const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
+  title: createUnionTypeTransformationSchema<any, string, false>(
+    noTransformationSchema,
+    base =>
+      typeof base === 'string'
+        ? requiredStringSchema()
+        : staticValueSchema(false)
+  ),
+};
+
+const transformSomeType = (input: unknown): SomeType =>
+  transformWithSchema(schema, input)[0];
+```
 
 #### Recursion
 
+Sometimes data structures are nested up to a unknown depth.
+The features seen until now are not able to support this use case because the transformation schema is a finite data structure.
+It is possible to trick TypeScript into supporting this use case and `transformWithSchema` is able to handle it in most cases.
+
+**Caution: This can result in a infinite recursion if the input value is a infinite structure too!!!**
+
+Example of recursive schema:
+
+```typescript
+type File = { name: string };
+type Directory = { name: string; files: File[]; directories: Directory[] };
+const schema: ObjectTransformationSchema<Directory> = {
+  name: requiredStringSchema(),
+  files: [
+    {
+      name: requiredStringSchema(),
+    },
+  ],
+  directories: [] as any,
+};
+schema.directories = [schema];
+```
+
+As seen above it is necessary to create the schema in two steps.
+Since the schema in the first step is not valid we need to tell TypeScript to not check it with `as any`.
+
+<!--
 ### Custom value transformations
 
 #### getValidationRemark
@@ -826,7 +962,87 @@ const output = {
 </td>
 <td>:x:</td>
 </tr>
+<tr>
+<td rowspan="3">
+
+```typescript
+const schema = {
+  a: staticValueSchema(true),
+  b: addStaticValueSchema(true),
+};
+```
+
+</td>
+<td>
+
+```typescript
+const input = {};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  a: true,
+  b: true,
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {
+  a: true,
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  a: true,
+  b: true,
+};
+```
+
+</td>
+<td>:white_check_mark:</td>
+</tr>
+<tr>
+<td>
+
+```typescript
+const input = {
+  a: false,
+  b: false,
+};
+```
+
+</td>
+<td>
+
+```typescript
+const output = {
+  a: true,
+  b: true,
+};
+```
+
+</td>
+<td>:x:</td>
+</tr>
 </table>
+<!--
+Union transformer examples
+Recursion examples
+Custom transformer examples
+-->
 
 ## Inspiration
 

@@ -1,5 +1,7 @@
 import {
   addStaticValueSchema,
+  createUnionTypeTransformationSchema,
+  noTransformationSchema,
   optionalBooleanSchema,
   optionalColorStringSchema,
   optionalNumberSchema,
@@ -11,12 +13,80 @@ import {
   requiredNumberSchema,
   requiredStringSchema,
   requiredTimeSchema,
+  staticValueSchema,
   transformWithSchema,
+  DeepWithoutUnionTypes,
   ObjectTransformationSchema,
+  UnionType2,
 } from '..';
 import { assert } from '../utils';
 
 describe('examples', () => {
+  {
+    type SomeTypeSchemaDefinition = {
+      readonly title: UnionType2<string, false>;
+    };
+    type SomeType = DeepWithoutUnionTypes<SomeTypeSchemaDefinition>;
+
+    const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
+      title: createUnionTypeTransformationSchema<any, string, false>(
+        noTransformationSchema,
+        base =>
+          typeof base === 'string'
+            ? requiredStringSchema()
+            : staticValueSchema(false)
+      ),
+    };
+
+    const transformSomeType = (input: unknown): SomeType =>
+      transformWithSchema(schema, input)[0];
+
+    assert({
+      given: 'example 1 union transformation',
+      should: 'be correct',
+      actual: () =>
+        transformSomeType({
+          title: 'foo',
+        }),
+      expected: {
+        title: 'foo',
+      },
+    });
+
+    assert({
+      given: 'example 2 union transformation',
+      should: 'be correct',
+      actual: () =>
+        transformSomeType({
+          title: false,
+        }),
+      expected: {
+        title: false,
+      },
+    });
+
+    assert({
+      given: 'example 3 union transformation',
+      should: 'be correct',
+      actual: () => transformSomeType({}),
+      expected: {
+        title: false,
+      },
+    });
+
+    assert({
+      given: 'example 4 union transformation',
+      should: 'be correct',
+      actual: () =>
+        transformSomeType({
+          title: true,
+        }),
+      expected: {
+        title: false,
+      },
+    });
+  }
+
   {
     enum AinurType {
       VALAR = 'VALAR',
@@ -377,6 +447,49 @@ describe('examples', () => {
       expected: {
         name: 'Elwe',
         type: ElfType.TELERI,
+      },
+    });
+  }
+  {
+    const schema = {
+      a: staticValueSchema(true),
+      b: addStaticValueSchema(true),
+    };
+
+    assert({
+      given: 'example 14',
+      should: 'be correct',
+      actual: () => transformWithSchema(schema, {})[0],
+      expected: {
+        a: true,
+        b: true,
+      },
+    });
+
+    assert({
+      given: 'example 15',
+      should: 'be correct',
+      actual: () =>
+        transformWithSchema(schema, {
+          a: true,
+        })[0],
+      expected: {
+        a: true,
+        b: true,
+      },
+    });
+
+    assert({
+      given: 'example 16',
+      should: 'be correct',
+      actual: () =>
+        transformWithSchema(schema, {
+          a: false,
+          b: false,
+        })[0],
+      expected: {
+        a: true,
+        b: true,
       },
     });
   }
