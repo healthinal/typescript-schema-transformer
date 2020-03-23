@@ -22,7 +22,7 @@ import {
 import { assert } from '../utils';
 
 const values = <T extends object, K extends keyof T>(obj: T): T[K][] =>
-  Object.keys(obj).map(k => (obj as any)[k]);
+  Object.keys(obj).map((k) => (obj as any)[k]);
 
 describe('examples', () => {
   {
@@ -34,7 +34,7 @@ describe('examples', () => {
     const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
       title: createUnionTypeTransformationSchema<any, string, false>(
         noTransformationSchema,
-        base =>
+        (base) =>
           typeof base === 'string'
             ? requiredStringSchema()
             : staticValueSchema(false)

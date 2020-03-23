@@ -29,7 +29,7 @@ describe('transformWithSchema() with schemas containing union types', () => {
           prop: [
             createUnionTypeTransformationSchema<any, string, number>(
               noTransformationSchema,
-              base =>
+              (base) =>
                 typeof base === 'string'
                   ? requiredStringSchema()
                   : requiredNumberSchema()
@@ -55,7 +55,7 @@ describe('transformWithSchema() with schemas containing union types', () => {
     }> = {
       prop: createUnionTypeTransformationSchema<any, string, boolean>(
         noTransformationSchema,
-        base =>
+        (base) =>
           typeof base === 'string'
             ? requiredStringSchema()
             : requiredBooleanSchema(true)
@@ -96,7 +96,7 @@ describe('transformWithSchema() with schemas containing union types', () => {
     }> = {
       prop: createUnionTypeTransformationSchema<any, string | undefined, Color>(
         noTransformationSchema,
-        base =>
+        (base) =>
           typeof base === 'object'
             ? {
                 red: requiredNumberSchema(),
@@ -244,12 +244,12 @@ describe('transformWithSchema() with schemas containing union types', () => {
       abcd: UnionType4<A, B, C, D>;
       abcde: UnionType5<A, B, C, D, E>;
     }> = {
-      ab: createUnionTypeTransformationSchema<Base, A, B>(baseSchema, base =>
+      ab: createUnionTypeTransformationSchema<Base, A, B>(baseSchema, (base) =>
         base.type === BaseType.A ? aSchema : bSchema
       ),
       abc: createUnionTypeTransformationSchema<Base, A, B, C>(
         baseSchema,
-        base =>
+        (base) =>
           base.type === BaseType.A
             ? aSchema
             : base.type === BaseType.B
@@ -258,7 +258,7 @@ describe('transformWithSchema() with schemas containing union types', () => {
       ),
       abcd: createUnionTypeTransformationSchema<Base, A, B, C, D>(
         baseSchema,
-        base =>
+        (base) =>
           base.type === BaseType.A
             ? aSchema
             : base.type === BaseType.B
@@ -269,7 +269,7 @@ describe('transformWithSchema() with schemas containing union types', () => {
       ),
       abcde: createUnionTypeTransformationSchema<Base, A, B, C, D, E>(
         baseSchema,
-        base =>
+        (base) =>
           base.type === BaseType.A
             ? aSchema
             : base.type === BaseType.B

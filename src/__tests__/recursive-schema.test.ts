@@ -117,7 +117,7 @@ describe('transformWithSchema() with recursive schemas', () => {
       any,
       undefined,
       LinkedListItem
-    >(noTransformationSchema, base =>
+    >(noTransformationSchema, (base) =>
       typeof base === 'object' ? schema : staticValueSchema(undefined)
     );
 
