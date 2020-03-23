@@ -422,7 +422,7 @@ describe('requiredEnumSchema() with number enum', () => {
     C = 2,
   }
   const enumValues = filter(
-    value => typeof value === 'number',
+    (value) => typeof value === 'number',
     values(TestEnum)
   );
   const type = 'enum (one of these values: [0, 1, 2])';

@@ -47,7 +47,7 @@ const transformWithArrayTransformationSchema = <T>(
 
   // @ts-ignore
   return pipe(
-    map(objectToTransform =>
+    map((objectToTransform) =>
       transformValueAccordingToSchema(schema, objectToTransform)
     ),
     addIndex<

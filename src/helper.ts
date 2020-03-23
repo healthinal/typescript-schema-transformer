@@ -13,9 +13,6 @@ export const getValidationRemark = (
   value: any,
   transformedTo: any
 ) =>
-  `Expected field to be of type ${expectedType +
-    (transformedTo === undefined
-      ? ' or undefined/null'
-      : '')} -> transform ${JSON.stringify(value)} to ${JSON.stringify(
-    transformedTo
-  )}`;
+  `Expected field to be of type ${
+    expectedType + (transformedTo === undefined ? ' or undefined/null' : '')
+  } -> transform ${JSON.stringify(value)} to ${JSON.stringify(transformedTo)}`;

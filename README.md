@@ -341,7 +341,7 @@ type Color = { red: number; green: number; blue: number };
 const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
   color: createUnionTypeTransformationSchema<any, string | undefined, Color>(
     noTransformationSchema,
-    base =>
+    (base) =>
       typeof base === 'object'
         ? {
             red: requiredNumberSchema(),
@@ -431,7 +431,7 @@ type SomeType = DeepWithoutUnionTypes<SomeTypeSchemaDefinition>;
 const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
   title: createUnionTypeTransformationSchema<any, string, false>(
     noTransformationSchema,
-    base =>
+    (base) =>
       typeof base === 'string'
         ? requiredStringSchema()
         : staticValueSchema(false)
@@ -483,7 +483,7 @@ type ValueTransformationSchema<T extends SupportedValueTypes> = (
   value: unknown
 ) => [T, string | undefined];
 
-const evenNumberSchema: ValueTransformationSchema<number> = value =>
+const evenNumberSchema: ValueTransformationSchema<number> = (value) =>
   typeof value === 'number' && value % 2 === 0
     ? [value, undefined]
     : [0, value + ' is not a even number'];
@@ -501,12 +501,12 @@ to create those functions.
 export const requiredEvenNumberSchema = createValueTransformationSchema<number>(
   'even number',
   0,
-  value => typeof value === 'number' && value % 2 === 0
+  (value) => typeof value === 'number' && value % 2 === 0
 );
 
 export const optionalEvenNumberSchema = createValueTransformationSchemaForOptionalValue<
   number
->('even number', value => typeof value === 'number' && value % 2 === 0);
+>('even number', (value) => typeof value === 'number' && value % 2 === 0);
 ```
 
 The type is only for the error message.
@@ -930,7 +930,7 @@ const output = {
 
 ```typescript
 const values = <T extends object, K extends keyof T>(obj: T): T[K][] =>
-  Object.keys(obj).map(k => (obj as any)[k]);
+  Object.keys(obj).map((k) => (obj as any)[k]);
 
 enum ElfType {
   VANYAR = 'VANYAR',

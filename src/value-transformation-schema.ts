@@ -18,7 +18,7 @@ export const createValueTransformationSchema = <T extends SupportedValueTypes>(
   shouldRaiseRemark: (value: unknown) => boolean = complement(isValid)
 ) => (
   overridableDefaultValue: T = defaultValue
-): ValueTransformationSchema<T> => value => [
+): ValueTransformationSchema<T> => (value) => [
   isValid(value) ? (value as any) : overridableDefaultValue,
   shouldRaiseRemark(value)
     ? getValidationRemark(type, value, overridableDefaultValue)
@@ -33,9 +33,9 @@ export const createValueTransformationSchemaForOptionalValue = <
 ) =>
   createValueTransformationSchema(
     type,
-    undefined as (T | undefined),
+    undefined as T | undefined,
     isValid,
-    value => !isValid(value) && !isNil(value)
+    (value) => !isValid(value) && !isNil(value)
   );
 
 export const requiredStringSchema = createValueTransformationSchema<string>(
@@ -97,7 +97,7 @@ export const requiredEnumSchema = <T extends SupportedValueTypes>(
   createValueTransformationSchema(
     `enum (one of these values: [${join(', ', enumValues)}])`,
     defaultValue,
-    value => includes(value, enumValues)
+    (value) => includes(value, enumValues)
   )(defaultValue);
 
 export const staticValueSchema = <T extends SupportedValueTypes>(
@@ -106,7 +106,7 @@ export const staticValueSchema = <T extends SupportedValueTypes>(
   createValueTransformationSchema(
     `static value (${staticValue})`,
     staticValue,
-    value => value === staticValue
+    (value) => value === staticValue
   )(staticValue);
 
 export const addStaticValueSchema = <T extends SupportedValueTypes>(

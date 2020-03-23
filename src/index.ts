@@ -5,6 +5,10 @@ export {
   UnionType3,
   UnionType4,
   UnionType5,
+  UnionType6,
+  UnionType7,
+  UnionType8,
+  UnionType9,
 } from './types';
 
 export * from './core';

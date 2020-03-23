@@ -48,7 +48,7 @@
     "tslint": "^5.20.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-standard": "^9.0.0",
-    "typescript": "^3.6.4"
+    "typescript": "~3.8.3"
   },
   "dependencies": {
     "date-fns": "^2.4.1",

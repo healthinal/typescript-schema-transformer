@@ -40,7 +40,7 @@ export const logWarningIfValidationRemarksArePresent = (
     );
     console.groupCollapsed(`Warnings for ${transformationName}`);
     forEach(
-      warning => console.info(warning),
+      (warning) => console.info(warning),
       validationRemarksToStrings(validationRemarks)
     );
     console.groupEnd();
