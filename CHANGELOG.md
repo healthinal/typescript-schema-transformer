@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+## [1.3.2](https://github.com/healthinal/typescript-schema-transformer/compare/v1.3.1...v1.3.2) (2020-03-24)
+
+
+### Bug Fixes
+
+* use parseISO of date-fns instead of custom format for ISO dates ([c57816f](https://github.com/healthinal/typescript-schema-transformer/commit/c57816fb47c01a82e9b7489f0f586f8306151455))
+
 ## [1.3.1](https://github.com/healthinal/typescript-schema-transformer/compare/v1.3.0...v1.3.1) (2020-03-23)
 
 
