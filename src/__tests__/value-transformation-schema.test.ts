@@ -291,6 +291,13 @@ describe('requiredIsoDateTimeSchema()', () => {
   });
 
   assert({
+    given: 'a iso date time with time zone and milliseconds',
+    should: 'return the value without validation remark',
+    actual: () => requiredIsoDateTimeSchema()('2020-03-09T14:31:45.179Z'),
+    expected: ['2020-03-09T14:31:45.179Z', undefined],
+  });
+
+  assert({
     given: 'undefined',
     should: 'return default value and validation remark',
     actual: () => requiredIsoDateTimeSchema()(undefined),
@@ -311,6 +318,20 @@ describe('requiredIsoDateTimeSchema()', () => {
     expected: [
       '0001-01-01T00:00:00',
       getValidationRemark('iso date time string', 'foo', '0001-01-01T00:00:00'),
+    ],
+  });
+
+  assert({
+    given: 'a iso date time which is not possible',
+    should: 'return default value and validation remark',
+    actual: () => requiredIsoDateTimeSchema()('2001-02-29T00:00:00'),
+    expected: [
+      '0001-01-01T00:00:00',
+      getValidationRemark(
+        'iso date time string',
+        '2001-02-29T00:00:00',
+        '0001-01-01T00:00:00'
+      ),
     ],
   });
 

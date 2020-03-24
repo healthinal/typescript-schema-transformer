@@ -307,7 +307,7 @@ It does not only check the format but also if it is a real time (e. g. 22:45:70 
 
 ##### requiredIsoDateTimeSchema(defaultValue?: string): ValueTransformationSchema\<string>
 
-Does the same checks as `requiredDateSchema` and `requiredTimeSchema` but with the format YYYY-MM-DDThh:mm:ss (e. g. 2019-02-03T13:59:12).
+Does the same checks as `requiredDateSchema` and `requiredTimeSchema` but has to be parsable by [parseISO of date-fns](https://date-fns.org/v2.11.0/docs/parseISO).
 
 ##### optionalColorStringSchema(): ValueTransformationSchema<string | undefined>
 
