@@ -41,7 +41,7 @@
     "rimraf": "^3.0.0",
     "rollup": "^2.0.0",
     "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-filesize": "^6.2.0",
+    "rollup-plugin-filesize": "^7.0.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^5.1.2",
     "semantic-release": "^17.0.0",
