@@ -2,17 +2,15 @@
 
 ## [1.3.2](https://github.com/healthinal/typescript-schema-transformer/compare/v1.3.1...v1.3.2) (2020-03-24)
 
-
 ### Bug Fixes
 
-* use parseISO of date-fns instead of custom format for ISO dates ([c57816f](https://github.com/healthinal/typescript-schema-transformer/commit/c57816fb47c01a82e9b7489f0f586f8306151455))
+- use parseISO of date-fns instead of custom format for ISO dates ([c57816f](https://github.com/healthinal/typescript-schema-transformer/commit/c57816fb47c01a82e9b7489f0f586f8306151455))
 
 ## [1.3.1](https://github.com/healthinal/typescript-schema-transformer/compare/v1.3.0...v1.3.1) (2020-03-23)
 
-
 ### Bug Fixes
 
-* upgrade to TS 3.8 and export union types 6-9 ([cae80ee](https://github.com/healthinal/typescript-schema-transformer/commit/cae80ee98339c0576afcc60a8e24c65160007fae))
+- upgrade to TS 3.8 and export union types 6-9 ([cae80ee](https://github.com/healthinal/typescript-schema-transformer/commit/cae80ee98339c0576afcc60a8e24c65160007fae))
 
 # [1.3.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.2.1...v1.3.0) (2020-02-06)
 
