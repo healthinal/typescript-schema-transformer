@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+# [1.4.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.3.3...v1.4.0) (2020-05-05)
+
+
+### Features
+
+* add silent value schemas ([10eb15e](https://github.com/healthinal/typescript-schema-transformer/commit/10eb15ec50e042aa7fa1f7665394e6f630e4c095))
+
 ## [1.3.3](https://github.com/healthinal/typescript-schema-transformer/compare/v1.3.2...v1.3.3) (2020-04-16)
 
 
