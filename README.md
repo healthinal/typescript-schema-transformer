@@ -285,13 +285,25 @@ Required transformers allow the default value to be overridden, otherwise the pr
 
 ##### requiredStringSchema(defaultValue?: string): ValueTransformationSchema\<string>
 
+##### silentRequiredStringSchema(defaultValue?: string): ValueTransformationSchema\<string>
+
+Never produces validation remarks.
+
 ##### optionalStringSchema(): ValueTransformationSchema<string | undefined>
 
 ##### requiredNumberSchema(defaultValue?: number): ValueTransformationSchema\<number>
 
+##### silentRequiredNumberSchema(defaultValue?: number): ValueTransformationSchema\<number>
+
+Never produces validation remarks.
+
 ##### optionalNumberSchema(): ValueTransformationSchema<number | undefined>
 
 ##### requiredBooleanSchema(defaultValue?: boolean): ValueTransformationSchema\<boolean>
+
+##### silentRequiredBooleanSchema(defaultValue?: boolean): ValueTransformationSchema\<boolean>
+
+Never produces validation remarks.
 
 ##### optionalBooleanSchema(): ValueTransformationSchema<boolean | undefined>
 

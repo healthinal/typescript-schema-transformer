@@ -14,6 +14,9 @@ import {
   requiredNumberSchema,
   requiredStringSchema,
   requiredTimeSchema,
+  silentRequiredBooleanSchema,
+  silentRequiredNumberSchema,
+  silentRequiredStringSchema,
   staticValueSchema,
 } from '..';
 import { getValidationRemark } from '../helper';
@@ -46,6 +49,36 @@ describe('requiredStringSchema()', () => {
     should: 'return the special default value',
     actual: () => requiredStringSchema('bar')(undefined),
     expected: ['bar', getValidationRemark('string', undefined, 'bar')],
+  });
+});
+
+describe('silentRequiredStringSchema()', () => {
+  assert({
+    given: 'a string',
+    should: 'return the value without validation remark',
+    actual: () => silentRequiredStringSchema()('foo'),
+    expected: ['foo', undefined],
+  });
+
+  assert({
+    given: 'undefined',
+    should: 'return default value without validation remark',
+    actual: () => silentRequiredStringSchema()(undefined),
+    expected: ['', undefined],
+  });
+
+  assert({
+    given: 'a number',
+    should: 'return default value without validation remark',
+    actual: () => silentRequiredStringSchema()(123),
+    expected: ['', undefined],
+  });
+
+  assert({
+    given: 'special default value',
+    should: 'return the special default value',
+    actual: () => silentRequiredStringSchema('bar')(undefined),
+    expected: ['bar', undefined],
   });
 });
 
@@ -102,6 +135,36 @@ describe('requiredNumberSchema()', () => {
   });
 });
 
+describe('silentRequiredNumberSchema()', () => {
+  assert({
+    given: 'a number',
+    should: 'return the value without validation remark',
+    actual: () => silentRequiredNumberSchema()(123),
+    expected: [123, undefined],
+  });
+
+  assert({
+    given: 'undefined',
+    should: 'return default value without validation remark',
+    actual: () => silentRequiredNumberSchema()(undefined),
+    expected: [0, undefined],
+  });
+
+  assert({
+    given: 'a string',
+    should: 'return default value without validation remark',
+    actual: () => silentRequiredNumberSchema()('foo'),
+    expected: [0, undefined],
+  });
+
+  assert({
+    given: 'special default value',
+    should: 'return the special default value',
+    actual: () => silentRequiredNumberSchema(99)(undefined),
+    expected: [99, undefined],
+  });
+});
+
 describe('optionalNumberSchema()', () => {
   assert({
     given: 'a number',
@@ -155,12 +218,49 @@ describe('requiredBooleanSchema()', () => {
   });
 });
 
+describe('silentRequiredBooleanSchema()', () => {
+  assert({
+    given: 'a boolean',
+    should: 'return the value without validation remark',
+    actual: () => silentRequiredBooleanSchema()(true),
+    expected: [true, undefined],
+  });
+
+  assert({
+    given: 'undefined',
+    should: 'return default value without validation remark',
+    actual: () => silentRequiredBooleanSchema()(undefined),
+    expected: [false, undefined],
+  });
+
+  assert({
+    given: 'a string',
+    should: 'return default value without validation remark',
+    actual: () => silentRequiredBooleanSchema()('foo'),
+    expected: [false, undefined],
+  });
+
+  assert({
+    given: 'special default value',
+    should: 'return the special default value',
+    actual: () => silentRequiredBooleanSchema(true)(undefined),
+    expected: [true, undefined],
+  });
+});
+
 describe('optionalBooleanSchema()', () => {
   assert({
     given: 'a boolean',
     should: 'return the value without validation remark',
     actual: () => optionalBooleanSchema()(true),
     expected: [true, undefined],
+  });
+
+  assert({
+    given: 'undefined with false as default value',
+    should: 'return false without validation remark',
+    actual: () => optionalBooleanSchema(false)(undefined),
+    expected: [false, undefined],
   });
 
   assert({

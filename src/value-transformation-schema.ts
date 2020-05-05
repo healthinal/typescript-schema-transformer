@@ -38,11 +38,27 @@ export const createValueTransformationSchemaForOptionalValue = <
     (value) => !isValid(value) && !isNil(value)
   );
 
+export const createSilentValueTransformationSchema = <
+  T extends SupportedValueTypes
+>(
+  defaultValue: T,
+  isValid: (value: unknown) => boolean
+) =>
+  createValueTransformationSchema(
+    'silent transformer (never used)',
+    defaultValue,
+    isValid,
+    () => false
+  );
+
 export const requiredStringSchema = createValueTransformationSchema<string>(
   'string',
   '',
   isString
 );
+export const silentRequiredStringSchema = createSilentValueTransformationSchema<
+  string
+>('', isString);
 export const optionalStringSchema = createValueTransformationSchemaForOptionalValue<
   string
 >('string', isString);
@@ -52,6 +68,9 @@ export const requiredNumberSchema = createValueTransformationSchema<number>(
   0,
   isNumber
 );
+export const silentRequiredNumberSchema = createSilentValueTransformationSchema<
+  number
+>(0, isNumber);
 export const optionalNumberSchema = createValueTransformationSchemaForOptionalValue<
   number
 >('number', isNumber);
@@ -61,6 +80,9 @@ export const requiredBooleanSchema = createValueTransformationSchema<boolean>(
   false,
   isBoolean
 );
+export const silentRequiredBooleanSchema = createSilentValueTransformationSchema<
+  boolean
+>(false, isBoolean);
 export const optionalBooleanSchema = createValueTransformationSchemaForOptionalValue<
   boolean
 >('boolean', isBoolean);
