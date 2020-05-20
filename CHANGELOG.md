@@ -1,5 +1,13 @@
 # Changelog typescript-schema-transformer
 
+## [1.4.2](https://github.com/healthinal/typescript-schema-transformer/compare/v1.4.1...v1.4.2) (2020-05-20)
+
+
+### Bug Fixes
+
+* upgrade date-fns from 2.13.0 to 2.14.0 ([71a6d6c](https://github.com/healthinal/typescript-schema-transformer/commit/71a6d6ce7681a1f4674c5d83f81f67183d60188a))
+* upgrade date-fns from 2.13.0 to 2.14.0 ([13e0649](https://github.com/healthinal/typescript-schema-transformer/commit/13e064924299af6ebfb701686ef9615639743ab0))
+
 ## [1.4.1](https://github.com/healthinal/typescript-schema-transformer/compare/v1.4.0...v1.4.1) (2020-05-12)
 
 
