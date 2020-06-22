@@ -312,14 +312,20 @@ Never produces validation remarks.
 This ensures the string to be a valid date of the format YYYY-MM-DD.
 It does not only check the format but also if it is a real date (e. g. 2019-02-30 is not a valid date).
 
+##### optionalDateSchema(defaultValue?: string): ValueTransformationSchema\<string | undefined>
+
 ##### requiredTimeSchema(defaultValue?: string): ValueTransformationSchema\<string>
 
 This ensures the string to be a valid time of the format hh:mm:ss.
 It does not only check the format but also if it is a real time (e. g. 22:45:70 is not a valid time).
 
+##### optionalTimeSchema(defaultValue?: string): ValueTransformationSchema\<string | undefined>
+
 ##### requiredIsoDateTimeSchema(defaultValue?: string): ValueTransformationSchema\<string>
 
 Does the same checks as `requiredDateSchema` and `requiredTimeSchema` but has to be parsable by [parseISO of date-fns](https://date-fns.org/v2.11.0/docs/parseISO).
+
+##### optionalIsoDateTimeSchema(defaultValue?: string): ValueTransformationSchema\<string | undefined>
 
 ##### optionalColorStringSchema(): ValueTransformationSchema<string | undefined>
 

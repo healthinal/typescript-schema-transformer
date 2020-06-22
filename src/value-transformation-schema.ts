@@ -87,25 +87,33 @@ export const optionalBooleanSchema = createValueTransformationSchemaForOptionalV
   boolean
 >('boolean', isBoolean);
 
+const isValidDateSchema = both(isString, isValidDate);
 export const requiredDateSchema = createValueTransformationSchema<string>(
   'date',
   '0001-01-01',
-  both(isString, isValidDate)
+  isValidDateSchema
 );
+export const optionalDateSchema = createValueTransformationSchemaForOptionalValue<
+  string
+>('date', isValidDateSchema);
 
+const isValidTimeSchema = both(isString, isValidTime);
 export const requiredTimeSchema = createValueTransformationSchema<string>(
   'time',
   '00:00:00',
-  both(isString, isValidTime)
+  isValidTimeSchema
 );
+export const optionalTimeSchema = createValueTransformationSchemaForOptionalValue<
+  string
+>('time', isValidTimeSchema);
 
+const isValidIsoDateTimeSchema = both(isString, isValidIsoDate);
 export const requiredIsoDateTimeSchema = createValueTransformationSchema<
   string
->(
-  'iso date time string',
-  '0001-01-01T00:00:00',
-  both(isString, isValidIsoDate)
-);
+>('iso date time string', '0001-01-01T00:00:00', isValidIsoDateTimeSchema);
+export const optionalIsoDateTimeSchema = createValueTransformationSchemaForOptionalValue<
+  string
+>('iso date time string', isValidIsoDateTimeSchema);
 
 const isColorString = test(/^#[a-fA-F0-9]{6}$/);
 export const optionalColorStringSchema = createValueTransformationSchemaForOptionalValue<
