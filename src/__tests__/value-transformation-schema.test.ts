@@ -5,8 +5,11 @@ import {
   noTransformationSchema,
   optionalBooleanSchema,
   optionalColorStringSchema,
+  optionalDateSchema,
+  optionalIsoDateTimeSchema,
   optionalNumberSchema,
   optionalStringSchema,
+  optionalTimeSchema,
   requiredBooleanSchema,
   requiredDateSchema,
   requiredEnumSchema,
@@ -331,6 +334,36 @@ describe('requiredDateSchema()', () => {
   });
 });
 
+describe('optionalDateSchema', () => {
+  assert({
+    given: 'a date',
+    should: 'return the value without validation remark',
+    actual: () => optionalDateSchema()('2019-03-05'),
+    expected: ['2019-03-05', undefined],
+  });
+
+  assert({
+    given: 'undefined with 2019-04-05 as default value',
+    should: 'return 2019-04-05 without validation remark',
+    actual: () => optionalDateSchema('2019-04-05')(undefined),
+    expected: ['2019-04-05', undefined],
+  });
+
+  assert({
+    given: 'undefined',
+    should: 'return undefined without validation remark',
+    actual: () => optionalDateSchema()(undefined),
+    expected: [undefined, undefined],
+  });
+
+  assert({
+    given: 'a string',
+    should: 'return undefined and validation remark',
+    actual: () => optionalDateSchema()('foo'),
+    expected: [undefined, getValidationRemark('date', 'foo', undefined)],
+  });
+});
+
 describe('requiredTimeSchema()', () => {
   assert({
     given: 'a time',
@@ -379,6 +412,36 @@ describe('requiredTimeSchema()', () => {
     should: 'return the special default value',
     actual: () => requiredTimeSchema('12:00:15')(undefined),
     expected: ['12:00:15', getValidationRemark('time', undefined, '12:00:15')],
+  });
+});
+
+describe('optionalTimeSchema', () => {
+  assert({
+    given: 'a time',
+    should: 'return the value without validation remark',
+    actual: () => optionalTimeSchema()('13:10:34'),
+    expected: ['13:10:34', undefined],
+  });
+
+  assert({
+    given: 'undefined with 13:15:34 as default value',
+    should: 'return 13:15:34 without validation remark',
+    actual: () => optionalTimeSchema('13:15:34')(undefined),
+    expected: ['13:15:34', undefined],
+  });
+
+  assert({
+    given: 'undefined',
+    should: 'return undefined without validation remark',
+    actual: () => optionalTimeSchema()(undefined),
+    expected: [undefined, undefined],
+  });
+
+  assert({
+    given: 'a string',
+    should: 'return undefined and validation remark',
+    actual: () => optionalTimeSchema()('foo'),
+    expected: [undefined, getValidationRemark('time', 'foo', undefined)],
   });
 });
 
@@ -456,6 +519,39 @@ describe('requiredIsoDateTimeSchema()', () => {
         undefined,
         '2017-08-30T09:01:00'
       ),
+    ],
+  });
+});
+
+describe('optionalIsoDateTimeSchema', () => {
+  assert({
+    given: 'a iso date time',
+    should: 'return the value without validation remark',
+    actual: () => optionalIsoDateTimeSchema()('2019-02-03T13:59:12'),
+    expected: ['2019-02-03T13:59:12', undefined],
+  });
+
+  assert({
+    given: 'undefined with 2020-02-03T13:59:12 as default value',
+    should: 'return 2020-02-03T13:59:12 without validation remark',
+    actual: () => optionalIsoDateTimeSchema('2020-02-03T13:59:12')(undefined),
+    expected: ['2020-02-03T13:59:12', undefined],
+  });
+
+  assert({
+    given: 'undefined',
+    should: 'return undefined without validation remark',
+    actual: () => optionalIsoDateTimeSchema()(undefined),
+    expected: [undefined, undefined],
+  });
+
+  assert({
+    given: 'a string',
+    should: 'return undefined and validation remark',
+    actual: () => optionalIsoDateTimeSchema()('foo'),
+    expected: [
+      undefined,
+      getValidationRemark('iso date time string', 'foo', undefined),
     ],
   });
 });
