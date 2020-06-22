@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+# [1.5.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.4.2...v1.5.0) (2020-06-22)
+
+
+### Features
+
+* add optional date and time schemas ([c4d1eae](https://github.com/healthinal/typescript-schema-transformer/commit/c4d1eae097ebb3346556d487d18d39f8341cc202))
+
 ## [1.4.2](https://github.com/healthinal/typescript-schema-transformer/compare/v1.4.1...v1.4.2) (2020-05-20)
 
 
