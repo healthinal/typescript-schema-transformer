@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+# [1.6.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.5.4...v1.6.0) (2020-09-23)
+
+
+### Features
+
+* allow union types in createUnionTypeTransformationSchema ([93025c5](https://github.com/healthinal/typescript-schema-transformer/commit/93025c58f177276d83888a5c3c270d13befc9962))
+
 ## [1.5.4](https://github.com/healthinal/typescript-schema-transformer/compare/v1.5.3...v1.5.4) (2020-09-02)
 
 
