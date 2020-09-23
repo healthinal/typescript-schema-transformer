@@ -448,6 +448,8 @@ type SomeType = DeepWithoutUnionTypes<SomeTypeSchemaDefinition>;
 
 const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
   title: createUnionTypeTransformationSchema<any, string, false>(
+    // You could also write:
+    // title: createUnionTypeTransformationSchema<any, UnionType2<string, false>>(
     noTransformationSchema,
     (base) =>
       typeof base === 'string'
@@ -1139,9 +1141,11 @@ type Maiar = Ainur & {
   readonly hasRing: boolean;
 };
 
+type ValarOrMaiar = UnionType2<Valar, Maiar>;
+
 type World = {
   readonly name: string;
-  readonly ainur: readonly UnionType2<Valar, Maiar>[];
+  readonly ainur: readonly ValarOrMaiar[];
 };
 
 const ainurSchema: ObjectTransformationSchema<Ainur> = {
@@ -1164,7 +1168,7 @@ const maiarSchema: ObjectTransformationSchema<Maiar> = {
 const schema: ObjectTransformationSchema<World> = {
   name: requiredStringSchema(),
   ainur: [
-    createUnionTypeTransformationSchema<Ainur, Valar, Maiar>(
+    createUnionTypeTransformationSchema<Ainur, ValarOrMaiar>(
       ainurSchema,
       ({ type }) => (type === AinurType.VALAR ? valarSchema : maiarSchema)
     ),
