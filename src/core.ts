@@ -7,6 +7,7 @@ import {
   getTransformationSchemaKey,
   objectValidationRemarkKey,
   ArrayTransformationSchema,
+  OptionalTransformationSchema,
   SupportedValueTypes,
   ValidationRemarks,
   ValueTransformationSchema,
@@ -16,6 +17,11 @@ import { isObject, isString } from './utils';
 const isValueTransformationSchema = <T extends SupportedValueTypes>(
   val: any
 ): val is ValueTransformationSchema<T> => typeof val === 'function';
+
+const isOptionalTransformationSchema = <T>(
+  val: any
+): val is OptionalTransformationSchema<T> =>
+  !!val?.optionalTransformationSchema;
 
 const isArrayTransformationSchema = <T>(
   val: any
@@ -36,6 +42,17 @@ const transformWithValueTransformationSchema = <T extends SupportedValueTypes>(
     isString(validationRemarks) ? validationRemarks : {},
   ];
 };
+
+const transformWithOptionalTransformationSchema = <T>(
+  { optionalTransformationSchema }: OptionalTransformationSchema<T>,
+  valueToTransform: unknown
+): [T, ValidationRemarks] =>
+  isNil(valueToTransform)
+    ? [undefined, {}]
+    : transformValueAccordingToSchema(
+        optionalTransformationSchema,
+        valueToTransform
+      );
 
 const transformWithArrayTransformationSchema = <T>(
   [schema]: ArrayTransformationSchema<T>,
@@ -89,6 +106,8 @@ const transformValueAccordingToSchema = (
 ): [any, ValidationRemarks] =>
   isValueTransformationSchema(schema)
     ? transformWithValueTransformationSchema(schema, value)
+    : isOptionalTransformationSchema(schema)
+    ? transformWithOptionalTransformationSchema(schema, value)
     : isArrayTransformationSchema(schema)
     ? transformWithArrayTransformationSchema(schema, value)
     : isUnionTypeTransformationSchema(schema)

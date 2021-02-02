@@ -346,6 +346,40 @@ Without other elements this may seem quite odd but with union transformers it ca
 This is basically the same as `staticValueSchema` but does not raise a remark if the source object does not contain the value.
 It is useful to add an attribute for discriminated unions if the source (e. g. the API) does not deliver such a value.
 
+#### Optional schemas
+
+For value schemas one can just use an optional version to allow `undefined` values. As object and array schemas use
+the built-in object/array syntax, it is not directly possible to create a schema for the following type:
+
+```typescript
+type Human = {
+  readonly name?: string; // This is possible with optionalStringSchema
+  readonly serves?: Maiar;
+  readonly relatives?: string[];
+};
+```
+
+This problem could be resolved by union types (see below) as well but this would lead to overcomplicated code for such
+a common problem. Therefore, an optional schema can be used which is a wrapper allowing `undefined` values (`null` will
+be transformed to `undefined` as well). This optional wrapper schema can be used with any other schema.
+
+```typescript
+const schema = {
+  name: optionalSchema(requiredStringSchema()),
+  serves: optionalSchema({
+    name: requiredStringSchema(),
+    enemies: [requiredStringSchema()],
+  }),
+  relatives: optionalSchema([requiredStringSchema()]),
+};
+
+const [output] = transformWithSchema(schema, {});
+
+/*
+output1 = { name: undefined, serves: undefined, relatives: undefined }
+ */
+```
+
 #### Union
 
 Quite often, it is necessary to choose a transformation schema dynamically, e. g. if you receive a list of polymorphic objects which do not share every property.
