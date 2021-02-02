@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+# [1.7.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.6.0...v1.7.0) (2021-02-02)
+
+
+### Features
+
+* add optional schemas ([1f47f15](https://github.com/healthinal/typescript-schema-transformer/commit/1f47f155956956343367293ac11696f084f55015))
+
 # [1.6.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.5.4...v1.6.0) (2020-09-23)
 
 
