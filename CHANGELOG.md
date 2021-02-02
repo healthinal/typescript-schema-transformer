@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+## [1.7.1](https://github.com/healthinal/typescript-schema-transformer/compare/v1.7.0...v1.7.1) (2021-02-02)
+
+
+### Bug Fixes
+
+* improve type inference for optionalSchema ([7ad8ac0](https://github.com/healthinal/typescript-schema-transformer/commit/7ad8ac020de704b860041fe6847b7044059ebc75))
+
 # [1.7.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.6.0...v1.7.0) (2021-02-02)
 
 
