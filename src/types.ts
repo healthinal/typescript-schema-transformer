@@ -39,33 +39,45 @@ export type UnionType9<T1, T2, T3, T4, T5, T6, T7, T8, T9> = {
 
 export type SupportedValueTypes = boolean | number | string | undefined;
 
-export type AnyTransformationSchema =
-  | ValueTransformationSchema<SupportedValueTypes>
-  | OptionalTransformationSchema<any>
-  | ArrayTransformationSchema<any>
-  | ObjectTransformationSchema<any>
-  | UnionTypeTransformationSchema2<any, any, any>
-  | UnionTypeTransformationSchema3<any, any, any, any>
-  | UnionTypeTransformationSchema4<any, any, any, any, any>
-  | UnionTypeTransformationSchema5<any, any, any, any, any, any>
-  | UnionTypeTransformationSchema6<any, any, any, any, any, any, any>
-  | UnionTypeTransformationSchema7<any, any, any, any, any, any, any, any>
-  | UnionTypeTransformationSchema8<any, any, any, any, any, any, any, any, any>
-  | UnionTypeTransformationSchema9<
-      any,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any
-    >;
+export type AnyTransformationSchema<
+  V extends SupportedValueTypes,
+  T1,
+  T2,
+  T3,
+  T4,
+  T5,
+  T6,
+  T7,
+  T8,
+  T9,
+  T10
+> =
+  | ValueTransformationSchema<V>
+  | OptionalTransformationSchema<T1>
+  | ArrayTransformationSchema<T1>
+  | ObjectTransformationSchema<T1>
+  | UnionTypeTransformationSchema2<T1, T2, T3>
+  | UnionTypeTransformationSchema3<T1, T2, T3, T4>
+  | UnionTypeTransformationSchema4<T1, T2, T3, T4, T5>
+  | UnionTypeTransformationSchema5<T1, T2, T3, T4, T5, T6>
+  | UnionTypeTransformationSchema6<T1, T2, T3, T4, T5, T6, T7>
+  | UnionTypeTransformationSchema7<T1, T2, T3, T4, T5, T6, T7, T8>
+  | UnionTypeTransformationSchema8<T1, T2, T3, T4, T5, T6, T7, T8, T9>
+  | UnionTypeTransformationSchema9<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>;
 
 export type ExtractOriginalTypeFromTransformationSchema<
-  T extends AnyTransformationSchema
+  V extends SupportedValueTypes,
+  T1,
+  T2,
+  T3,
+  T4,
+  T5,
+  T6,
+  T7,
+  T8,
+  T9,
+  T10,
+  T extends AnyTransformationSchema<V, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
 > = T extends UnionTypeTransformationSchema2<any, infer T1, infer T2>
   ? UnionType2<T1, T2>
   : T extends UnionTypeTransformationSchema3<any, infer T1, infer T2, infer T3>
