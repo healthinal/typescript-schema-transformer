@@ -15,16 +15,17 @@ import { assert } from '../utils';
 
 describe('transformWithSchema() with optional schemas', () => {
   type TypeWithOptionalAttributes = {
-    a: { a1: string } | undefined;
+    a: { a1: { a2: string; a3: number } } | undefined;
     b: string[] | undefined;
     c: UnionType2<string, { c1: number }> | undefined;
     d: string | undefined;
     e: string | undefined;
+    f: { f1: { f2: number } }[] | undefined;
   };
 
   const schema: ObjectTransformationSchema<TypeWithOptionalAttributes> = {
     a: optionalSchema({
-      a1: requiredStringSchema(),
+      a1: { a2: requiredStringSchema(), a3: requiredNumberSchema() },
     }),
     b: optionalSchema([requiredStringSchema()]),
     c: optionalSchema(
@@ -38,6 +39,7 @@ describe('transformWithSchema() with optional schemas', () => {
     ),
     d: optionalSchema(requiredStringSchema()),
     e: optionalStringSchema(),
+    f: optionalSchema([{ f1: { f2: requiredNumberSchema() } }]),
   };
 
   assert({
@@ -51,6 +53,7 @@ describe('transformWithSchema() with optional schemas', () => {
         c: undefined,
         d: undefined,
         e: undefined,
+        f: undefined,
       },
       {
         [objectValidationRemarkKey]: getValidationRemark(
@@ -72,6 +75,7 @@ describe('transformWithSchema() with optional schemas', () => {
         c: null,
         d: null,
         e: null,
+        f: null,
       }),
     expected: [
       {
@@ -80,6 +84,7 @@ describe('transformWithSchema() with optional schemas', () => {
         c: undefined,
         d: undefined,
         e: undefined,
+        f: undefined,
       },
       {},
     ],
@@ -90,19 +95,21 @@ describe('transformWithSchema() with optional schemas', () => {
     should: 'not transform anything',
     actual: () =>
       transformWithSchema(schema, {
-        a: { a1: 'a1' },
+        a: { a1: { a2: 'a2', a3: 3 } },
         b: ['b1', 'b2'],
         c: { c1: 123 },
         d: 'd',
         e: 'e',
+        f: [{ f1: { f2: 1 } }, { f1: { f2: 2 } }],
       }),
     expected: [
       {
-        a: { a1: 'a1' },
+        a: { a1: { a2: 'a2', a3: 3 } },
         b: ['b1', 'b2'],
         c: { c1: 123 },
         d: 'd',
         e: 'e',
+        f: [{ f1: { f2: 1 } }, { f1: { f2: 2 } }],
       },
       {},
     ],
