@@ -1,11 +1,8 @@
 import {
-  createUnionTypeTransformationSchema,
-  noTransformationSchema,
+  optionalSchema,
   requiredStringSchema,
-  staticValueSchema,
   transformWithSchema,
-  ObjectTransformationSchema,
-  UnionType2,
+  TransformationSchema,
 } from '..';
 import { getValidationRemark } from '../helper';
 import { objectValidationRemarkKey } from '../types';
@@ -15,7 +12,7 @@ describe('transformWithSchema() with recursive schemas', () => {
   {
     type File = { name: string };
     type Directory = { name: string; files: File[]; directories: Directory[] };
-    const schema: ObjectTransformationSchema<Directory> = {
+    const schema: TransformationSchema<Directory> = {
       name: requiredStringSchema(),
       files: [
         {
@@ -107,19 +104,13 @@ describe('transformWithSchema() with recursive schemas', () => {
   {
     type LinkedListItem = {
       value: string;
-      next: UnionType2<undefined, LinkedListItem>;
+      next?: LinkedListItem;
     };
-    const schema: ObjectTransformationSchema<LinkedListItem> = {
+    const schema: TransformationSchema<LinkedListItem> = {
       value: requiredStringSchema(),
       next: undefined as any,
     };
-    schema.next = createUnionTypeTransformationSchema<
-      any,
-      undefined,
-      LinkedListItem
-    >(noTransformationSchema, (base) =>
-      typeof base === 'object' ? schema : staticValueSchema(undefined)
-    );
+    schema.next = optionalSchema(schema);
 
     assert({
       given: 'a recursive structure with object references',

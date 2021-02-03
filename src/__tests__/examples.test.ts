@@ -1,7 +1,6 @@
 import {
   addStaticValueSchema,
   createUnionTypeTransformationSchema,
-  noTransformationSchema,
   optionalBooleanSchema,
   optionalColorStringSchema,
   optionalNumberSchema,
@@ -16,8 +15,8 @@ import {
   staticValueSchema,
   transformWithSchema,
   DeepWithoutUnionTypes,
-  ObjectTransformationSchema,
-  UnionType2,
+  TransformationSchema,
+  UnionType,
 } from '..';
 import { assert } from '../utils';
 
@@ -27,17 +26,15 @@ const values = <T extends object, K extends keyof T>(obj: T): T[K][] =>
 describe('examples', () => {
   {
     type SomeTypeSchemaDefinition = {
-      readonly title: UnionType2<string, false>;
+      readonly title: UnionType<[string, false]>;
     };
     type SomeType = DeepWithoutUnionTypes<SomeTypeSchemaDefinition>;
 
-    const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
-      title: createUnionTypeTransformationSchema<any, string, false>(
-        noTransformationSchema,
-        (base) =>
-          typeof base === 'string'
-            ? requiredStringSchema()
-            : staticValueSchema(false)
+    const schema: TransformationSchema<SomeTypeSchemaDefinition> = {
+      title: createUnionTypeTransformationSchema<[string, false]>((base) =>
+        typeof base === 'string'
+          ? requiredStringSchema()
+          : staticValueSchema(false)
       ),
     };
 
@@ -103,7 +100,7 @@ describe('examples', () => {
       readonly isFemale: boolean;
     };
 
-    const valarSchema: ObjectTransformationSchema<Valar> = {
+    const valarSchema: TransformationSchema<Valar> = {
       type: addStaticValueSchema(AinurType.VALAR),
       name: requiredStringSchema(),
       domain: optionalStringSchema(),
@@ -199,7 +196,7 @@ describe('examples', () => {
       }[];
     };
 
-    const maiarSchema: ObjectTransformationSchema<Maiar> = {
+    const maiarSchema: TransformationSchema<Maiar> = {
       name: requiredStringSchema(),
       enemies: [requiredStringSchema()],
       friends: [optionalStringSchema()],
@@ -518,32 +515,26 @@ describe('examples', () => {
 
     type World = {
       readonly name: string;
-      readonly ainur: readonly UnionType2<Valar, Maiar>[];
+      readonly ainur: readonly UnionType<[Valar, Maiar]>[];
     };
 
-    const ainurSchema: ObjectTransformationSchema<Ainur> = {
-      type: requiredEnumSchema(values(AinurType)),
-      name: requiredStringSchema(),
-    };
-
-    const valarSchema: ObjectTransformationSchema<Valar> = {
-      ...ainurSchema,
+    const valarSchema: TransformationSchema<Valar> = {
       type: addStaticValueSchema(AinurType.VALAR),
+      name: requiredStringSchema(),
       domain: requiredStringSchema(),
     };
 
-    const maiarSchema: ObjectTransformationSchema<Maiar> = {
-      ...ainurSchema,
+    const maiarSchema: TransformationSchema<Maiar> = {
       type: addStaticValueSchema(AinurType.MAIAR),
+      name: requiredStringSchema(),
       hasRing: requiredBooleanSchema(),
     };
 
-    const worldSchema: ObjectTransformationSchema<World> = {
+    const worldSchema: TransformationSchema<World> = {
       name: requiredStringSchema(),
       ainur: [
-        createUnionTypeTransformationSchema<Ainur, Valar, Maiar>(
-          ainurSchema,
-          ({ type }) => (type === AinurType.VALAR ? valarSchema : maiarSchema)
+        createUnionTypeTransformationSchema<[Valar, Maiar]>((base) =>
+          base?.type === AinurType.MAIAR ? maiarSchema : valarSchema
         ),
       ],
     };
@@ -609,7 +600,7 @@ describe('examples', () => {
       readonly isFemale: boolean;
     };
 
-    const valarSchema: ObjectTransformationSchema<Valar> = {
+    const valarSchema: TransformationSchema<Valar> = {
       name: requiredStringSchema(),
       isFemale: requiredBooleanSchema(true),
     };

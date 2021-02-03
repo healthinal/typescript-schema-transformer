@@ -9,149 +9,15 @@ export type ValidationRemarks =
       [key: string]: ValidationRemarks;
     };
 
-export const baseTransformationSchemaKey = Symbol();
 export const getTransformationSchemaKey = Symbol();
 
-export type UnionType2<T1, T2> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality-2']: never;
-};
-export type UnionType3<T1, T2, T3> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality-3']: never;
-};
-export type UnionType4<T1, T2, T3, T4> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality-4']: never;
-};
-export type UnionType5<T1, T2, T3, T4, T5> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality-5']: never;
-};
-export type UnionType6<T1, T2, T3, T4, T5, T6> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality-6']: never;
-};
-export type UnionType7<T1, T2, T3, T4, T5, T6, T7> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality-7']: never;
-};
-export type UnionType8<T1, T2, T3, T4, T5, T6, T7, T8> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality-8']: never;
-};
-export type UnionType9<T1, T2, T3, T4, T5, T6, T7, T8, T9> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality-9']: never;
+export const optionalSchemaKey = Symbol();
+
+export type UnionType<T extends any[]> = {
+  ['some-arbitrary-name-to-prevent-structural-type-equality']: never;
 };
 
 export type SupportedValueTypes = boolean | number | string | undefined;
-
-export type AnyTransformationSchema<
-  V extends SupportedValueTypes,
-  T1,
-  T2,
-  T3,
-  T4,
-  T5,
-  T6,
-  T7,
-  T8,
-  T9,
-  T10
-> =
-  | ValueTransformationSchema<V>
-  | OptionalTransformationSchema<T1>
-  | ArrayTransformationSchema<T1>
-  | ObjectTransformationSchema<T1>
-  | UnionTypeTransformationSchema2<T1, T2, T3>
-  | UnionTypeTransformationSchema3<T1, T2, T3, T4>
-  | UnionTypeTransformationSchema4<T1, T2, T3, T4, T5>
-  | UnionTypeTransformationSchema5<T1, T2, T3, T4, T5, T6>
-  | UnionTypeTransformationSchema6<T1, T2, T3, T4, T5, T6, T7>
-  | UnionTypeTransformationSchema7<T1, T2, T3, T4, T5, T6, T7, T8>
-  | UnionTypeTransformationSchema8<T1, T2, T3, T4, T5, T6, T7, T8, T9>
-  | UnionTypeTransformationSchema9<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>;
-
-export type ExtractOriginalTypeFromTransformationSchema<
-  V extends SupportedValueTypes,
-  T1,
-  T2,
-  T3,
-  T4,
-  T5,
-  T6,
-  T7,
-  T8,
-  T9,
-  T10,
-  T extends AnyTransformationSchema<V, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
-> = T extends UnionTypeTransformationSchema2<any, infer T1, infer T2>
-  ? UnionType2<T1, T2>
-  : T extends UnionTypeTransformationSchema3<any, infer T1, infer T2, infer T3>
-  ? UnionType3<T1, T2, T3>
-  : T extends UnionTypeTransformationSchema4<
-      any,
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4
-    >
-  ? UnionType4<T1, T2, T3, T4>
-  : T extends UnionTypeTransformationSchema5<
-      any,
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5
-    >
-  ? UnionType5<T1, T2, T3, T4, T5>
-  : T extends UnionTypeTransformationSchema6<
-      any,
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6
-    >
-  ? UnionType6<T1, T2, T3, T4, T5, T6>
-  : T extends UnionTypeTransformationSchema7<
-      any,
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6,
-      infer T7
-    >
-  ? UnionType7<T1, T2, T3, T4, T5, T6, T7>
-  : T extends UnionTypeTransformationSchema8<
-      any,
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6,
-      infer T7,
-      infer T8
-    >
-  ? UnionType8<T1, T2, T3, T4, T5, T6, T7, T8>
-  : T extends UnionTypeTransformationSchema9<
-      any,
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6,
-      infer T7,
-      infer T8,
-      infer T9
-    >
-  ? UnionType9<T1, T2, T3, T4, T5, T6, T7, T8, T9>
-  : T extends ArrayTransformationSchema<infer U>
-  ? U[]
-  : T extends ValueTransformationSchema<infer U>
-  ? U
-  : T extends ObjectTransformationSchema<infer U>
-  ? U
-  : never;
 
 // The array comparison syntax will prevent boolean from splitting up into ValueTransformer<true> and ValueTransformer<false>
 // (see https://github.com/Microsoft/TypeScript/issues/30029#issuecomment-466183104)
@@ -165,322 +31,61 @@ export type TransformationSchema<T> = undefined extends Extract<T, undefined>
   ? ValueTransformationSchema<T>
   : T extends (infer U)[]
   ? ArrayTransformationSchema<U>
-  : T extends UnionType2<infer T1, infer T2>
-  ? UnionTypeTransformationSchema2<any, T1, T2>
-  : T extends UnionType3<infer T1, infer T2, infer T3>
-  ? UnionTypeTransformationSchema3<any, T1, T2, T3>
-  : T extends UnionType4<infer T1, infer T2, infer T3, infer T4>
-  ? UnionTypeTransformationSchema4<any, T1, T2, T3, T4>
-  : T extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
-  ? UnionTypeTransformationSchema5<any, T1, T2, T3, T4, T5>
-  : T extends UnionType6<
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6
-    >
-  ? UnionTypeTransformationSchema6<any, T1, T2, T3, T4, T5, T6>
-  : T extends UnionType7<
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6,
-      infer T7
-    >
-  ? UnionTypeTransformationSchema7<any, T1, T2, T3, T4, T5, T6, T7>
-  : T extends UnionType8<
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6,
-      infer T7,
-      infer T8
-    >
-  ? UnionTypeTransformationSchema8<any, T1, T2, T3, T4, T5, T6, T7, T8>
-  : T extends UnionType9<
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6,
-      infer T7,
-      infer T8,
-      infer T9
-    >
-  ? UnionTypeTransformationSchema9<any, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+  : T extends UnionType<infer U>
+  ? UnionTypeTransformationSchema<U>
   : ObjectTransformationSchema<T>;
 
 export type ValueTransformationSchema<T extends SupportedValueTypes> = (
   value: unknown
 ) => [T, string | undefined];
 
-export type OptionalTransformationSchema<T> = {
-  readonly optionalTransformationSchema: TransformationSchema<
-    Exclude<T, undefined>
-  >;
-};
+export type ArrayTransformationSchema<T> = [TransformationSchema<T>];
 
-export type ArrayTransformationSchema<T> = [
-  [T] extends [SupportedValueTypes]
-    ? ValueTransformationSchema<T>
-    : undefined extends Extract<T, undefined>
-    ? OptionalTransformationSchema<Exclude<T, undefined>>
-    : T extends UnionType2<infer T1, infer T2>
-    ? UnionTypeTransformationSchema2<any, T1, T2>
-    : T extends UnionType3<infer T1, infer T2, infer T3>
-    ? UnionTypeTransformationSchema3<any, T1, T2, T3>
-    : T extends UnionType4<infer T1, infer T2, infer T3, infer T4>
-    ? UnionTypeTransformationSchema4<any, T1, T2, T3, T4>
-    : T extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
-    ? UnionTypeTransformationSchema5<any, T1, T2, T3, T4, T5>
-    : T extends UnionType6<
-        infer T1,
-        infer T2,
-        infer T3,
-        infer T4,
-        infer T5,
-        infer T6
-      >
-    ? UnionTypeTransformationSchema6<any, T1, T2, T3, T4, T5, T6>
-    : T extends UnionType7<
-        infer T1,
-        infer T2,
-        infer T3,
-        infer T4,
-        infer T5,
-        infer T6,
-        infer T7
-      >
-    ? UnionTypeTransformationSchema7<any, T1, T2, T3, T4, T5, T6, T7>
-    : T extends UnionType8<
-        infer T1,
-        infer T2,
-        infer T3,
-        infer T4,
-        infer T5,
-        infer T6,
-        infer T7,
-        infer T8
-      >
-    ? UnionTypeTransformationSchema8<any, T1, T2, T3, T4, T5, T6, T7, T8>
-    : T extends UnionType9<
-        infer T1,
-        infer T2,
-        infer T3,
-        infer T4,
-        infer T5,
-        infer T6,
-        infer T7,
-        infer T8,
-        infer T9
-      >
-    ? UnionTypeTransformationSchema9<any, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-    : ObjectTransformationSchema<T>
-];
 export type ObjectTransformationSchema<T> = {
   [K in keyof T]: TransformationSchema<T[K]>;
 };
 
-export type UnionTypeTransformationSchema2<B, T1, T2> = {
-  [baseTransformationSchemaKey]: TransformationSchema<B>;
-  [getTransformationSchemaKey]: (
-    base: B
-  ) => TransformationSchema<T1> | TransformationSchema<T2>;
-};
-export type UnionTypeTransformationSchema3<B, T1, T2, T3> = {
-  [baseTransformationSchemaKey]: TransformationSchema<B>;
-  [getTransformationSchemaKey]: (
-    base: B
-  ) =>
-    | TransformationSchema<T1>
-    | TransformationSchema<T2>
-    | TransformationSchema<T3>;
-};
-export type UnionTypeTransformationSchema4<B, T1, T2, T3, T4> = {
-  [baseTransformationSchemaKey]: TransformationSchema<B>;
-  [getTransformationSchemaKey]: (
-    base: B
-  ) =>
-    | TransformationSchema<T1>
-    | TransformationSchema<T2>
-    | TransformationSchema<T3>
-    | TransformationSchema<T4>;
-};
-export type UnionTypeTransformationSchema5<B, T1, T2, T3, T4, T5> = {
-  [baseTransformationSchemaKey]: TransformationSchema<B>;
-  [getTransformationSchemaKey]: (
-    base: B
-  ) =>
-    | TransformationSchema<T1>
-    | TransformationSchema<T2>
-    | TransformationSchema<T3>
-    | TransformationSchema<T4>
-    | TransformationSchema<T5>;
-};
-export type UnionTypeTransformationSchema6<B, T1, T2, T3, T4, T5, T6> = {
-  [baseTransformationSchemaKey]: TransformationSchema<B>;
-  [getTransformationSchemaKey]: (
-    base: B
-  ) =>
-    | TransformationSchema<T1>
-    | TransformationSchema<T2>
-    | TransformationSchema<T3>
-    | TransformationSchema<T4>
-    | TransformationSchema<T5>
-    | TransformationSchema<T6>;
-};
-export type UnionTypeTransformationSchema7<B, T1, T2, T3, T4, T5, T6, T7> = {
-  [baseTransformationSchemaKey]: TransformationSchema<B>;
-  [getTransformationSchemaKey]: (
-    base: B
-  ) =>
-    | TransformationSchema<T1>
-    | TransformationSchema<T2>
-    | TransformationSchema<T3>
-    | TransformationSchema<T4>
-    | TransformationSchema<T5>
-    | TransformationSchema<T6>
-    | TransformationSchema<T7>;
-};
-export type UnionTypeTransformationSchema8<
-  B,
-  T1,
-  T2,
-  T3,
-  T4,
-  T5,
-  T6,
-  T7,
-  T8
-> = {
-  [baseTransformationSchemaKey]: TransformationSchema<B>;
-  [getTransformationSchemaKey]: (
-    base: B
-  ) =>
-    | TransformationSchema<T1>
-    | TransformationSchema<T2>
-    | TransformationSchema<T3>
-    | TransformationSchema<T4>
-    | TransformationSchema<T5>
-    | TransformationSchema<T6>
-    | TransformationSchema<T7>
-    | TransformationSchema<T8>;
-};
-export type UnionTypeTransformationSchema9<
-  B,
-  T1,
-  T2,
-  T3,
-  T4,
-  T5,
-  T6,
-  T7,
-  T8,
-  T9
-> = {
-  [baseTransformationSchemaKey]: TransformationSchema<B>;
-  [getTransformationSchemaKey]: (
-    base: B
-  ) =>
-    | TransformationSchema<T1>
-    | TransformationSchema<T2>
-    | TransformationSchema<T3>
-    | TransformationSchema<T4>
-    | TransformationSchema<T5>
-    | TransformationSchema<T6>
-    | TransformationSchema<T7>
-    | TransformationSchema<T8>
-    | TransformationSchema<T9>;
+export type OptionalTransformationSchema<T> = {
+  readonly [optionalSchemaKey]: TransformationSchema<Exclude<T, undefined>>;
 };
 
-export type DeepWithoutUnionTypes<T> = {
-  [K in keyof T]: T[K] extends SupportedValueTypes
-    ? T[K]
-    : undefined extends Extract<T[K], undefined>
-    ? DeepWithoutUnionTypesOptional<Exclude<T[K], undefined>>
-    : T[K] extends (infer U)[]
-    ? DeepWithoutUnionTypesArray<U>
-    : T[K] extends UnionType2<infer T1, infer T2>
-    ? DeepWithoutUnionTypes<T1 | T2>
-    : T[K] extends UnionType3<infer T1, infer T2, infer T3>
-    ? DeepWithoutUnionTypes<T1 | T2 | T3>
-    : T[K] extends UnionType4<infer T1, infer T2, infer T3, infer T4>
-    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4>
-    : T[K] extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
-    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5>
-    : T[K] extends UnionType6<
-        infer T1,
-        infer T2,
-        infer T3,
-        infer T4,
-        infer T5,
-        infer T6
-      >
-    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6>
-    : T[K] extends UnionType7<
-        infer T1,
-        infer T2,
-        infer T3,
-        infer T4,
-        infer T5,
-        infer T6,
-        infer T7
-      >
-    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7>
-    : T[K] extends UnionType8<
-        infer T1,
-        infer T2,
-        infer T3,
-        infer T4,
-        infer T5,
-        infer T6,
-        infer T7,
-        infer T8
-      >
-    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8>
-    : T[K] extends UnionType9<
-        infer T1,
-        infer T2,
-        infer T3,
-        infer T4,
-        infer T5,
-        infer T6,
-        infer T7,
-        infer T8,
-        infer T9
-      >
-    ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>
-    : DeepWithoutUnionTypes<T[K]>;
+type MapTupleToTransformationSchemas<Tuple extends [...any[]]> = {
+  [Index in keyof Tuple]: TransformationSchema<Tuple[Index]>;
+} & { length: Tuple['length'] };
+
+export type TupleToUnionTypeTransformationSchemaFunction<T extends any[]> = (
+  // In theory, it would be better to use unknown but this would in turn
+  // make the the transformation functions unnecessary verbose.
+  base: any
+) => TupleToUnion<MapTupleToTransformationSchemas<T>>;
+
+export type UnionTypeTransformationSchema<T extends any[]> = {
+  [getTransformationSchemaKey]: TupleToUnionTypeTransformationSchemaFunction<T>;
 };
-type DeepWithoutUnionTypesArray<T> = ([T] extends [SupportedValueTypes]
+
+export type DeepWithoutUnionTypes<T> = T extends SupportedValueTypes
   ? T
   : undefined extends Extract<T, undefined>
-  ? DeepWithoutUnionTypesOptional<Exclude<T, undefined>>
-  : T extends UnionType2<infer T1, infer T2>
-  ? DeepWithoutUnionTypes<T1 | T2>
-  : T extends UnionType3<infer T1, infer T2, infer T3>
-  ? DeepWithoutUnionTypes<T1 | T2 | T3>
-  : T extends UnionType4<infer T1, infer T2, infer T3, infer T4>
-  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4>
-  : T extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
-  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5>
-  : T extends UnionType6<
-      infer T1,
-      infer T2,
-      infer T3,
-      infer T4,
-      infer T5,
-      infer T6
-    >
-  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6>
-  : T extends UnionType7<
+  ? DeepWithoutUnionTypes<Exclude<T, undefined>> | undefined
+  : T extends (infer U)[]
+  ? DeepWithoutUnionTypes<U>[]
+  : T extends UnionType<infer U>
+  ? DeepWithoutUnionTypes<TupleToUnion<U>>
+  : { [K in keyof T]: DeepWithoutUnionTypes<T[K]> };
+
+type TupleToUnion<T extends any[]> = T extends [infer T1]
+  ? T1
+  : T extends [infer T1, infer T2]
+  ? T1 | T2
+  : T extends [infer T1, infer T2, infer T3]
+  ? T1 | T2 | T3
+  : T extends [infer T1, infer T2, infer T3, infer T4]
+  ? T1 | T2 | T3 | T4
+  : T extends [infer T1, infer T2, infer T3, infer T4, infer T5]
+  ? T1 | T2 | T3 | T4 | T5
+  : T extends [infer T1, infer T2, infer T3, infer T4, infer T5, infer T6]
+  ? T1 | T2 | T3 | T4 | T5 | T6
+  : T extends [
       infer T1,
       infer T2,
       infer T3,
@@ -488,9 +93,9 @@ type DeepWithoutUnionTypesArray<T> = ([T] extends [SupportedValueTypes]
       infer T5,
       infer T6,
       infer T7
-    >
-  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7>
-  : T extends UnionType8<
+    ]
+  ? T1 | T2 | T3 | T4 | T5 | T6 | T7
+  : T extends [
       infer T1,
       infer T2,
       infer T3,
@@ -499,9 +104,9 @@ type DeepWithoutUnionTypesArray<T> = ([T] extends [SupportedValueTypes]
       infer T6,
       infer T7,
       infer T8
-    >
-  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8>
-  : T extends UnionType9<
+    ]
+  ? T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8
+  : T extends [
       infer T1,
       infer T2,
       infer T3,
@@ -511,61 +116,6 @@ type DeepWithoutUnionTypesArray<T> = ([T] extends [SupportedValueTypes]
       infer T7,
       infer T8,
       infer T9
-    >
-  ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>
-  : DeepWithoutUnionTypes<T>)[];
-type DeepWithoutUnionTypesOptional<T> =
-  | ([T] extends [SupportedValueTypes]
-      ? T
-      : T extends UnionType2<infer T1, infer T2>
-      ? DeepWithoutUnionTypes<T1 | T2>
-      : T extends UnionType3<infer T1, infer T2, infer T3>
-      ? DeepWithoutUnionTypes<T1 | T2 | T3>
-      : T extends UnionType4<infer T1, infer T2, infer T3, infer T4>
-      ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4>
-      : T extends UnionType5<infer T1, infer T2, infer T3, infer T4, infer T5>
-      ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5>
-      : T extends UnionType6<
-          infer T1,
-          infer T2,
-          infer T3,
-          infer T4,
-          infer T5,
-          infer T6
-        >
-      ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6>
-      : T extends UnionType7<
-          infer T1,
-          infer T2,
-          infer T3,
-          infer T4,
-          infer T5,
-          infer T6,
-          infer T7
-        >
-      ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7>
-      : T extends UnionType8<
-          infer T1,
-          infer T2,
-          infer T3,
-          infer T4,
-          infer T5,
-          infer T6,
-          infer T7,
-          infer T8
-        >
-      ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8>
-      : T extends UnionType9<
-          infer T1,
-          infer T2,
-          infer T3,
-          infer T4,
-          infer T5,
-          infer T6,
-          infer T7,
-          infer T8,
-          infer T9
-        >
-      ? DeepWithoutUnionTypes<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>
-      : DeepWithoutUnionTypes<T>)
-  | undefined;
+    ]
+  ? T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9
+  : never;
