@@ -1,5 +1,20 @@
 # Changelog typescript-schema-transformer
 
+# [2.0.0](https://github.com/healthinal/typescript-schema-transformer/compare/v1.7.1...v2.0.0) (2021-02-04)
+
+
+### Features
+
+* upgrade to TypeScript 4.1 and leverage its features ([e90b419](https://github.com/healthinal/typescript-schema-transformer/commit/e90b4198f704fcad21f34fd1fb594d78b5debd81))
+
+
+### BREAKING CHANGES
+
+* - Replace UnionTypeX by UnionType
+- Switch from ObjectTransformationSchema to TransformationSchema
+- Allow transformWithSchema to accept every possible schema (not only objects)
+- Fix the typing of optionalSchema
+
 ## [1.7.1](https://github.com/healthinal/typescript-schema-transformer/compare/v1.7.0...v1.7.1) (2021-02-02)
 
 
