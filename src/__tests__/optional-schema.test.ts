@@ -1,13 +1,12 @@
 import {
   createUnionTypeTransformationSchema,
-  noTransformationSchema,
   optionalSchema,
   optionalStringSchema,
   requiredNumberSchema,
   requiredStringSchema,
   transformWithSchema,
-  ObjectTransformationSchema,
-  UnionType2,
+  TransformationSchema,
+  UnionType,
 } from '..';
 import { getValidationRemark } from '../helper';
 import { objectValidationRemarkKey } from '../types';
@@ -15,26 +14,24 @@ import { assert } from '../utils';
 
 describe('transformWithSchema() with optional schemas', () => {
   type TypeWithOptionalAttributes = {
-    a: { a1: { a2: string; a3: number } } | undefined;
+    a: { a1: { a2: string; a3: number[] } } | undefined;
     b: string[] | undefined;
-    c: UnionType2<string, { c1: number }> | undefined;
+    c: UnionType<[string, { c1: number }]> | undefined;
     d: string | undefined;
     e: string | undefined;
     f: { f1: { f2: number } }[] | undefined;
   };
 
-  const schema: ObjectTransformationSchema<TypeWithOptionalAttributes> = {
+  const schema: TransformationSchema<TypeWithOptionalAttributes> = {
     a: optionalSchema({
-      a1: { a2: requiredStringSchema(), a3: requiredNumberSchema() },
+      a1: { a2: requiredStringSchema(), a3: [requiredNumberSchema()] },
     }),
     b: optionalSchema([requiredStringSchema()]),
     c: optionalSchema(
-      createUnionTypeTransformationSchema<any, string, { c1: number }>(
-        noTransformationSchema,
-        (x) =>
-          typeof x === 'string'
-            ? requiredStringSchema()
-            : { c1: requiredNumberSchema() }
+      createUnionTypeTransformationSchema((x) =>
+        typeof x === 'string'
+          ? requiredStringSchema()
+          : { c1: requiredNumberSchema() }
       )
     ),
     d: optionalSchema(requiredStringSchema()),
@@ -95,7 +92,7 @@ describe('transformWithSchema() with optional schemas', () => {
     should: 'not transform anything',
     actual: () =>
       transformWithSchema(schema, {
-        a: { a1: { a2: 'a2', a3: 3 } },
+        a: { a1: { a2: 'a2', a3: [3] } },
         b: ['b1', 'b2'],
         c: { c1: 123 },
         d: 'd',
@@ -104,7 +101,7 @@ describe('transformWithSchema() with optional schemas', () => {
       }),
     expected: [
       {
-        a: { a1: { a2: 'a2', a3: 3 } },
+        a: { a1: { a2: 'a2', a3: [3] } },
         b: ['b1', 'b2'],
         c: { c1: 123 },
         d: 'd',

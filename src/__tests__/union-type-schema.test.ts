@@ -1,20 +1,13 @@
-import { values } from 'ramda';
-
 import {
   createUnionTypeTransformationSchema,
-  noTransformationSchema,
   optionalColorStringSchema,
   requiredBooleanSchema,
-  requiredEnumSchema,
   requiredNumberSchema,
   requiredStringSchema,
   staticValueSchema,
   transformWithSchema,
-  ObjectTransformationSchema,
-  UnionType2,
-  UnionType3,
-  UnionType4,
-  UnionType5,
+  TransformationSchema,
+  UnionType,
 } from '..';
 import { getValidationRemark } from '../helper';
 import { assert } from '../utils';
@@ -27,15 +20,15 @@ describe('transformWithSchema() with schemas containing union types', () => {
       transformWithSchema(
         {
           prop: [
-            createUnionTypeTransformationSchema<any, string, number>(
-              noTransformationSchema,
-              (base) =>
-                typeof base === 'string'
-                  ? requiredStringSchema()
-                  : requiredNumberSchema()
+            createUnionTypeTransformationSchema<[string, number]>((base) =>
+              typeof base === 'string'
+                ? requiredStringSchema()
+                : requiredNumberSchema()
             ),
           ],
-        } as ObjectTransformationSchema<{ prop: UnionType2<string, number>[] }>,
+        } as TransformationSchema<{
+          prop: UnionType<[string, number]>[];
+        }>,
         { prop: ['foo', false, 5, undefined] }
       ),
     expected: [
@@ -50,15 +43,13 @@ describe('transformWithSchema() with schemas containing union types', () => {
   });
 
   {
-    const schema: ObjectTransformationSchema<{
-      prop: UnionType2<string, boolean>;
+    const schema: TransformationSchema<{
+      prop: UnionType<[string, boolean]>;
     }> = {
-      prop: createUnionTypeTransformationSchema<any, string, boolean>(
-        noTransformationSchema,
-        (base) =>
-          typeof base === 'string'
-            ? requiredStringSchema()
-            : requiredBooleanSchema(true)
+      prop: createUnionTypeTransformationSchema<[string, boolean]>((base) =>
+        typeof base === 'string'
+          ? requiredStringSchema()
+          : requiredBooleanSchema(true)
       ),
     };
 
@@ -91,11 +82,10 @@ describe('transformWithSchema() with schemas containing union types', () => {
 
   {
     type Color = { red: number; green: number; blue: number };
-    const schema: ObjectTransformationSchema<{
-      prop: UnionType2<string | undefined, Color>;
+    const schema: TransformationSchema<{
+      prop: UnionType<[string | undefined, Color]>;
     }> = {
-      prop: createUnionTypeTransformationSchema<any, string | undefined, Color>(
-        noTransformationSchema,
+      prop: createUnionTypeTransformationSchema<[string | undefined, Color]>(
         (base) =>
           typeof base === 'object'
             ? {
@@ -207,78 +197,68 @@ describe('transformWithSchema() with schemas containing union types', () => {
       E,
     }
 
-    type Base = { type: BaseType };
     type A = { type: BaseType.A; a: string };
     type B = { type: BaseType.B; b: number };
     type C = { type: BaseType.C; c: boolean };
     type D = { type: BaseType.D; d: string[] };
     type E = { type: BaseType.E; e: { name: string } };
 
-    const baseSchema: ObjectTransformationSchema<Base> = {
-      type: requiredEnumSchema(values(BaseType)),
-    };
-    const aSchema: ObjectTransformationSchema<A> = {
+    const aSchema: TransformationSchema<A> = {
       type: staticValueSchema(BaseType.A),
       a: requiredStringSchema(),
     };
-    const bSchema: ObjectTransformationSchema<B> = {
+    const bSchema: TransformationSchema<B> = {
       type: staticValueSchema(BaseType.B),
       b: requiredNumberSchema(),
     };
-    const cSchema: ObjectTransformationSchema<C> = {
+    const cSchema: TransformationSchema<C> = {
       type: staticValueSchema(BaseType.C),
       c: requiredBooleanSchema(),
     };
-    const dSchema: ObjectTransformationSchema<D> = {
+    const dSchema: TransformationSchema<D> = {
       type: staticValueSchema(BaseType.D),
       d: [requiredStringSchema()],
     };
-    const eSchema: ObjectTransformationSchema<E> = {
+    const eSchema: TransformationSchema<E> = {
       type: staticValueSchema(BaseType.E),
       e: { name: requiredStringSchema() },
     };
 
-    const schema: ObjectTransformationSchema<{
-      ab: UnionType2<A, B>;
-      abc: UnionType3<A, B, C>;
-      abcd: UnionType4<A, B, C, D>;
-      abcde: UnionType5<A, B, C, D, E>;
+    const schema: TransformationSchema<{
+      ab: UnionType<[A, B]>;
+      abc: UnionType<[A, B, C]>;
+      abcd: UnionType<[A, B, C, D]>;
+      abcde: UnionType<[A, B, C, D, E]>;
     }> = {
-      ab: createUnionTypeTransformationSchema<Base, A, B>(baseSchema, (base) =>
-        base.type === BaseType.A ? aSchema : bSchema
+      ab: createUnionTypeTransformationSchema<[A, B]>((base) =>
+        base?.type === BaseType.A ? aSchema : bSchema
       ),
-      abc: createUnionTypeTransformationSchema<Base, A, B, C>(
-        baseSchema,
-        (base) =>
-          base.type === BaseType.A
-            ? aSchema
-            : base.type === BaseType.B
-            ? bSchema
-            : cSchema
+      abc: createUnionTypeTransformationSchema<[A, B, C]>((base) =>
+        base?.type === BaseType.A
+          ? aSchema
+          : base?.type === BaseType.B
+          ? bSchema
+          : cSchema
       ),
-      abcd: createUnionTypeTransformationSchema<Base, A, B, C, D>(
-        baseSchema,
-        (base) =>
-          base.type === BaseType.A
-            ? aSchema
-            : base.type === BaseType.B
-            ? bSchema
-            : base.type === BaseType.C
-            ? cSchema
-            : dSchema
+      abcd: createUnionTypeTransformationSchema<[A, B, C, D]>((base) =>
+        base?.type === BaseType.A
+          ? aSchema
+          : base?.type === BaseType.B
+          ? bSchema
+          : base?.type === BaseType.C
+          ? cSchema
+          : dSchema
       ),
-      abcde: createUnionTypeTransformationSchema<Base, A, B, C, D, E>(
-        baseSchema,
-        (base) =>
-          base.type === BaseType.A
-            ? aSchema
-            : base.type === BaseType.B
-            ? bSchema
-            : base.type === BaseType.C
-            ? cSchema
-            : base.type === BaseType.D
-            ? dSchema
-            : eSchema
+      abcde: createUnionTypeTransformationSchema<[A, B, C, D, E]>((base) =>
+        base?.type === BaseType.A
+          ? aSchema
+          : base?.type === BaseType.B
+          ? bSchema
+          : base?.type === BaseType.C
+          ? cSchema
+          : base?.type === BaseType.D
+          ? dSchema
+          : eSchema
       ),
     };
 

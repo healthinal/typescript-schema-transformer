@@ -1,14 +1,7 @@
 export {
   DeepWithoutUnionTypes,
-  ObjectTransformationSchema,
-  UnionType2,
-  UnionType3,
-  UnionType4,
-  UnionType5,
-  UnionType6,
-  UnionType7,
-  UnionType8,
-  UnionType9,
+  TransformationSchema,
+  UnionType,
 } from './types';
 
 export * from './core';

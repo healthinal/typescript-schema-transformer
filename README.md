@@ -12,7 +12,7 @@ Ensure your typings match the runtime object structures.
 ```typescript
 import {
   addStaticValueSchema,
-  ObjectTransformationSchema,
+  TransformationSchema,
   optionalStringSchema,
   requiredBooleanSchema,
   requiredStringSchema,
@@ -31,7 +31,7 @@ type Valar = {
   readonly isFemale: boolean;
 };
 
-const valarSchema: ObjectTransformationSchema<Valar> = {
+const valarSchema: TransformationSchema<Valar> = {
   type: addStaticValueSchema(AinurType.VALAR),
   name: requiredStringSchema(),
   domain: optionalStringSchema(),
@@ -94,7 +94,7 @@ import { transformWithSchema } from '@healthinal/typescript-schema-transformer';
 
 ### Transform
 
-#### transformWithSchema(schema: ObjectTransformationSchema\<T>, objectToTransform: unknown): [T, ValidationRemarks]
+#### transformWithSchema(schema: TransformationSchema\<T>, objectToTransform: unknown): [T, ValidationRemarks]
 
 This is the main function to call from this library.
 The first argument is a schema which describes the type T and how a value can be transformed to this type.
@@ -115,7 +115,7 @@ type Valar = {
   readonly isFemale: boolean;
 };
 
-const valarSchema: ObjectTransformationSchema<Valar> = {
+const valarSchema: TransformationSchema<Valar> = {
   name: requiredStringSchema(),
   isFemale: requiredBooleanSchema(true),
 };
@@ -190,7 +190,7 @@ if (hasNoValidationRemarks(validationRemarks)) {
 ### Schema
 
 To be able to transform an object a schema describing the transformation has to exist for a type.
-The typical process is to create a schema constant of the type `ObjectTransformationSchema<YourType>` which will help to create a correct schema for the type.
+The typical process is to create a schema constant of the type `TransformationSchema<YourType>` which will help to create a correct schema for the type.
 Your IDE should also be able to help with autocompletion in this process.
 
 #### Object schema
@@ -198,7 +198,7 @@ Your IDE should also be able to help with autocompletion in this process.
 The root of a schema is always a object schema.
 It is used to transform an object literal with zero to n (finite) keys.
 The values of the properties are object, array or value schemas.
-The used schemas have to match the passed type (referenced in ObjectTransformationSchema, TypeScript should enforce this).
+The used schemas have to match the passed type (referenced in TransformationSchema, TypeScript should enforce this).
 
 Imagine a value of the following type should be transformed:
 
@@ -215,7 +215,7 @@ There are several possible object schemas which will result in different transfo
 Example 1:
 
 ```typescript
-const valarSchema: ObjectTransformationSchema<Valar> = {
+const valarSchema: TransformationSchema<Valar> = {
   name: requiredStringSchema(),
   domain: optionalStringSchema(),
   isFemale: requiredBooleanSchema(),
@@ -227,7 +227,7 @@ This is the most basic schema which will use the predefined default values.
 Example 2:
 
 ```typescript
-const valarSchema: ObjectTransformationSchema<Valar> = {
+const valarSchema: TransformationSchema<Valar> = {
   name: requiredStringSchema('no name available'),
   domain: requiredStringSchema(),
   isFemale: requiredBooleanSchema(),
@@ -244,7 +244,7 @@ Example 3 (DOES NOT WORK):
 
 ```typescript
 // NOT VALID
-const valarSchema: ObjectTransformationSchema<Valar> = {
+const valarSchema: TransformationSchema<Valar> = {
   name: optionalStringSchema(),
   domain: optionalNumberSchema(),
   isFemale: requiredNumberSchema(),
@@ -267,7 +267,7 @@ type Maiar = {
   readonly enemies: readonly string[];
 };
 
-const maiarSchema: ObjectTransformationSchema<Maiar> = {
+const maiarSchema: TransformationSchema<Maiar> = {
   name: requiredStringSchema(),
   enemies: [requiredStringSchema()],
 };
@@ -383,15 +383,15 @@ output1 = { name: undefined, serves: undefined, relatives: undefined }
 #### Union
 
 Quite often, it is necessary to choose a transformation schema dynamically, e. g. if you receive a list of polymorphic objects which do not share every property.
-To support such use cases this library has a feature called union transformers.
-The basic idea is to have some optional prior transformation and then decide based on the data you receive which schema to apply.
+To support such use cases, this library has a feature called union transformers.
+The basic idea is to have a function which decides based on the data you receive on the schema to apply.
 
 Example:
 
 ```typescript
 type Color = { red: number; green: number; blue: number };
-const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
-  color: createUnionTypeTransformationSchema<any, string | undefined, Color>(
+const schema: TransformationSchema<SomeTypeSchemaDefinition> = {
+  color: createUnionTypeTransformationSchema<[string | undefined, Color]>(
     noTransformationSchema,
     (base) =>
       typeof base === 'object'
@@ -425,22 +425,20 @@ output3 = { color: undefined }
 */
 ```
 
-The example above uses the function `createUnionTypeTransformationSchema(baseTransformationSchema, result => specificTransformationSchema)`
+The example above uses the function `createUnionTypeTransformationSchema(base => specificTransformationSchema)`
 to transform objects containing a color field, which can either hold a color string or an object with three numeric values representing a color.
-The type of `createUnionTypeTransformationSchema` is quite verbose so it is omitted here (you can see it [here](https://github.com/healthinal/typescript-schema-transformer/blob/master/src/union-type-transformation-schema.ts#L15)).
-For now, it is only important to remember that the first argument can do some transformation prior to the decision
-(this step can be omitted by using the `noTransformationSchema: ValueTransformationSchema\<any>` schema which leaves every value as it is)
-and the second argument is a function which receives the base transformed value and returns the transformation schema
-which is then actually used in the transformation.
-The type parameters of `createUnionTypeTransformationSchema` are quite important because they determine the possible results of the transformation.
-The first parameter is the result of the base transformation (in the example above `any` because of the `noTransformationSchema`).
-All type parameters after the first one are possible types of specific transformation schemas.
+The type of `createUnionTypeTransformationSchema` contains a lot of calculated values, so it is omitted here (you can see it [here](https://github.com/healthinal/typescript-schema-transformer/blob/master/src/union-type-transformation-schema.ts)).
+For now, it is only important to remember that the argument is a function which receives the untransformed value and
+returns the transformation schema which is then actually used in the transformation.
+The type parameter of `createUnionTypeTransformationSchema` is quite important because they determine the possible results of the transformation.
+It is a tuple with all types which are possible types of specific transformation schemas.
 In the example above it is possible to return a schema which can transform a value of the type `string | undefined` or `Color`.
-If we would add a forth type parameter of `boolean` it would be possible to return a `requiredBooleanSchema` as the specific transformation schema.
+If we added a third type of `boolean`, it would be possible to return a `requiredBooleanSchema` as the specific transformation schema.
 
-_Side note: Ideally the type parameters of `createUnionTypeTransformationSchema` would be variadic but TypeScript does not support this. Therefore it is
-currently only possible to have nine additional parameters. This should be sufficient for most use cases.
-This issue is the reason there is a different type for each arity of the types `UnionType2`, `UnionType3`, ..., `UnionType9` (see below)._
+\_Side note: Ideally the union types would be resolved completely dynamic. As it turns out, recursion and the conversion
+of tuple types to unions do not work very well together in TS. Therefore, the resolution is done manually with a helper
+type which transforms tuple types to unions. This helper type currently only allows nine types in a tuple but
+this should be sufficient for most use cases.
 
 In the example above you might wonder what `SomeTypeSchemaDefinition` looks like. Ideally it would look like this:
 
@@ -453,42 +451,36 @@ type SomeTypeSchemaDefinition = {
 
 The issue with this type definition is that it is almost impossible to correctly split union types automatically.
 You will encounter issues like `boolean` being split into `true | false`.
-Therefore it is required to give the schema a hint which parts a union consists of.
+Therefore, it is required to give the schema a hint which parts a union consists of.
 You can do this like this:
 
 ```typescript
 type SomeTypeSchemaDefinition = {
-  readonly color: UnionType2<string | undefined, Color>;
+  readonly color: UnionType<[string | undefined, Color]>;
 };
 ```
 
-If you now create a schema with `ObjectTransformationSchema<SomeTypeSchemaDefinition>` you will be forced to use a
+If you now create a schema with `TransformationSchema<SomeTypeSchemaDefinition>` you will be forced to use a
 union transformer which handles those two cases with `createUnionTypeTransformationSchema`.
 
-With this solution one new issue arises: The type `SomeType` should actually contain a TypeScript union and not the custom type `UnionType2`.
-One possibility would be to create `SomeTypeSchemaDefinition` (containing `UnionType2<string | undefined, Color>`) as well
+With this solution one new issue arises: The type `SomeType` should actually contain a TypeScript union and not the custom type `UnionType`.
+One possibility would be to create `SomeTypeSchemaDefinition` (containing `UnionType<[string | undefined, Color]>`) as well
 as `SomeType` (containing the union `(string | undefined) | Color`) manually.
 But this would be very repetitive and `SomeType` can be calculated easily.
-To solve this issue there is the type helper `DeepWithoutUnionTypes` which removes all `UnionTypeX` and replaces them
+To solve this issue there is the type helper `DeepWithoutUnionTypes` which removes all `UnionType` and replaces them
 with the matching union type.
 
 The following example shows how this could be used with the other parts:
 
 ```typescript
 type SomeTypeSchemaDefinition = {
-  readonly title: UnionType2<string, false>;
+  readonly title: UnionType<[string, false]>;
 };
 type SomeType = DeepWithoutUnionTypes<SomeTypeSchemaDefinition>;
 
-const schema: ObjectTransformationSchema<SomeTypeSchemaDefinition> = {
-  title: createUnionTypeTransformationSchema<any, string, false>(
-    // You could also write:
-    // title: createUnionTypeTransformationSchema<any, UnionType2<string, false>>(
-    noTransformationSchema,
-    (base) =>
-      typeof base === 'string'
-        ? requiredStringSchema()
-        : staticValueSchema(false)
+const schema: TransformationSchema<SomeTypeSchemaDefinition> = {
+  title: createUnionTypeTransformationSchema<[string, false]>((base) =>
+    typeof base === 'string' ? requiredStringSchema() : staticValueSchema(false)
   ),
 };
 
@@ -509,7 +501,7 @@ Example of recursive schema:
 ```typescript
 type File = { name: string };
 type Directory = { name: string; files: File[]; directories: Directory[] };
-const schema: ObjectTransformationSchema<Directory> = {
+const schema: TransformationSchema<Directory> = {
   name: requiredStringSchema(),
   files: [
     {
@@ -575,7 +567,7 @@ If you need more examples, feel free to head over to the [test suite](https://gi
 The examples assume a basic transformation like this:
 
 ```typescript
-const schema: ObjectTransformationSchema<SomeType> = {
+const schema: TransformationSchema<SomeType> = {
   // ...
 };
 const [output] = transformWithSchema(schema, input);
@@ -585,7 +577,7 @@ The corresponding type will be omitted in the examples because it can be derived
 Accordingly the following schema...
 
 ```typescript
-const schema: ObjectTransformationSchema<SomeType> = {
+const schema: TransformationSchema<SomeType> = {
   foo: requiredStringSchema(),
   bar: [requiredBooleanSchema()],
 };
@@ -1175,36 +1167,28 @@ type Maiar = Ainur & {
   readonly hasRing: boolean;
 };
 
-type ValarOrMaiar = UnionType2<Valar, Maiar>;
-
 type World = {
   readonly name: string;
-  readonly ainur: readonly ValarOrMaiar[];
+  readonly ainur: readonly UnionType<[Valar, Maiar]>[];
 };
 
-const ainurSchema: ObjectTransformationSchema<Ainur> = {
-  type: requiredEnumSchema(values(AinurType)),
-  name: requiredStringSchema(),
-};
-
-const valarSchema: ObjectTransformationSchema<Valar> = {
-  ...ainurSchema,
+const valarSchema: TransformationSchema<Valar> = {
   type: addStaticValueSchema(AinurType.VALAR),
+  name: requiredStringSchema(),
   domain: requiredStringSchema(),
 };
 
-const maiarSchema: ObjectTransformationSchema<Maiar> = {
-  ...ainurSchema,
+const maiarSchema: TransformationSchema<Maiar> = {
   type: addStaticValueSchema(AinurType.MAIAR),
+  name: requiredStringSchema(),
   hasRing: requiredBooleanSchema(),
 };
 
-const schema: ObjectTransformationSchema<World> = {
+const schema: TransformationSchema<World> = {
   name: requiredStringSchema(),
   ainur: [
-    createUnionTypeTransformationSchema<Ainur, ValarOrMaiar>(
-      ainurSchema,
-      ({ type }) => (type === AinurType.VALAR ? valarSchema : maiarSchema)
+    createUnionTypeTransformationSchema<[Valar, Maiar]>((base) =>
+      base?.type === AinurType.MAIAR ? maiarSchema : valarSchema
     ),
   ],
 };
@@ -1279,7 +1263,7 @@ const output = {
 ```typescript
 type File = { name: string };
 type Directory = { name: string; files: File[]; directories: Directory[] };
-const schema: ObjectTransformationSchema<Directory> = {
+const schema: TransformationSchema<Directory> = {
   name: requiredStringSchema(),
   files: [
     {

@@ -26,6 +26,21 @@ describe('transformWithSchema() with basic schemas', () => {
   });
 
   assert({
+    given: 'receives undefined',
+    should: 'create array',
+    actual: () => transformWithSchema([requiredStringSchema()], undefined),
+    expected: [[], getValidationRemark('array', undefined, [])],
+  });
+
+  assert({
+    given: 'receives array of strings',
+    should: 'do nothing',
+    actual: () =>
+      transformWithSchema([requiredStringSchema()], ['a', 'b', 'c']),
+    expected: [['a', 'b', 'c'], {}],
+  });
+
+  assert({
     given: 'expects property with object literal and receives empty object',
     should: 'add object literal',
     actual: () =>
