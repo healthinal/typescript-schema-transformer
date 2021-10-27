@@ -20,7 +20,8 @@
     "lint:fix": "yarn lint --fix",
     "prebuild": "rimraf tmp dist coverage",
     "build": "tsc -p tsconfig.build.json && rollup -c",
-    "postbuild": "rimraf tmp"
+    "postbuild": "rimraf tmp",
+    "license:check": "license-checker-rseidelsohn --onlyAllow 'Apache;Apache-2.0;BSD;ISC;MIT' --excludePrivatePackages --excludePackages 'axe-core;caniuse-lite;language-subtag-registry;password-prompt;spdx-exceptions;cypress;@csstools/convert-colors;@csstools/normalize.css;css-blank-pseudo;css-has-pseudo;css-prefers-color-scheme;cssdb;mdn-data;postcss-browser-comments;postcss-color-functional-notation;postcss-color-mod-function;postcss-dir-pseudo-class;postcss-preset-env;postcss-double-position-gradients;postcss-preset-env;postcss-env-function;postcss-focus-visible;postcss-focus-visible;postcss-focus-within;postcss-gap-properties;postcss-image-set-function;postcss-lab-function;postcss-logical;postcss-nesting;postcss-normalize;postcss-overflow-shorthand;postcss-place;postcss-pseudo-class-any-link;sanitize.css;spdx-license-ids;tweetnacl;lz-string;jsonify;left-pad;big-integer;stream-buffers;bin-links;gentle-fs;npm;npm-lifecycle'"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
@@ -37,6 +38,7 @@
     "babel-jest": "^24.9.0",
     "husky": "^4.0.6",
     "jest": "^24.9.0",
+    "license-checker-rseidelsohn": "^2.2.0",
     "lint-staged": "^10.0.3",
     "prettier": "2.0.4",
     "pretty-quick": "^2.0.0",

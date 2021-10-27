@@ -24,6 +24,10 @@ jobs:
             - node_modules
 
       - run:
+          name: Check licenses
+          command: yarn license:check
+
+      - run:
           name: Unit Testing
           command: yarn run test --coverage
 
