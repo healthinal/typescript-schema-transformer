@@ -271,7 +271,18 @@ describe('examples', () => {
   }
 
   {
-    const schema = {
+    const schema: TransformationSchema<{
+      a: string;
+      b?: string;
+      c: number;
+      d: number | undefined;
+      e: boolean;
+      f?: boolean;
+      g: string;
+      h: string;
+      i: string;
+      j?: string;
+    }> = {
       a: requiredStringSchema(),
       b: optionalStringSchema(),
       c: requiredNumberSchema(),

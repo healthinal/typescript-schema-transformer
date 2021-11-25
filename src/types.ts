@@ -13,8 +13,9 @@ export const getTransformationSchemaKey = Symbol();
 
 export const optionalSchemaKey = Symbol();
 
+const unionTypeKey = Symbol();
 export type UnionType<T extends any[]> = {
-  ['some-arbitrary-name-to-prevent-structural-type-equality']: never;
+  [unionTypeKey]: never;
 };
 
 export type SupportedValueTypes = boolean | number | string | undefined;
@@ -41,9 +42,36 @@ export type ValueTransformationSchema<T extends SupportedValueTypes> = (
 
 export type ArrayTransformationSchema<T> = [TransformationSchema<T>];
 
-export type ObjectTransformationSchema<T> = {
+const wrapperKey = Symbol();
+type Wrapper<T> = {
+  [wrapperKey]: never;
+};
+
+type WrapOptional<T> = {
+  [K in keyof T]: undefined extends Extract<T[K], undefined>
+    ? Wrapper<T[K]>
+    : T[K];
+};
+
+type RemoveOptional<T> = {
+  [K in keyof T]-?: T[K];
+};
+
+type RemoveWrap<T> = {
+  [K in keyof T]: T[K] extends Wrapper<infer U> ? U : T[K];
+};
+
+type TransformOptionalToUndefinedUnion<T> = RemoveWrap<
+  RemoveOptional<WrapOptional<T>>
+>;
+
+type ObjectToTransformationSchema<T> = {
   [K in keyof T]: TransformationSchema<T[K]>;
 };
+
+export type ObjectTransformationSchema<T> = ObjectToTransformationSchema<
+  TransformOptionalToUndefinedUnion<T>
+>;
 
 export type OptionalTransformationSchema<T> = {
   readonly [optionalSchemaKey]: TransformationSchema<Exclude<T, undefined>>;
