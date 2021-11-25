@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+# [2.1.0](https://github.com/healthinal/typescript-schema-transformer/compare/v2.0.6...v2.1.0) (2021-11-25)
+
+
+### Features
+
+* require a schema for optional (prop ?: type) properties ([92530df](https://github.com/healthinal/typescript-schema-transformer/commit/92530dfa1e75cfc9442ea7e4b3b07c64f0d5fb7a))
+
 ## [2.0.6](https://github.com/healthinal/typescript-schema-transformer/compare/v2.0.5...v2.0.6) (2021-11-22)
 
 
