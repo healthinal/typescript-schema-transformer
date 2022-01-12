@@ -1,5 +1,12 @@
 # Changelog typescript-schema-transformer
 
+## [2.1.3](https://github.com/healthinal/typescript-schema-transformer/compare/v2.1.2...v2.1.3) (2022-01-12)
+
+
+### Bug Fixes
+
+* package.json & yarn.lock to reduce vulnerabilities ([75c125d](https://github.com/healthinal/typescript-schema-transformer/commit/75c125d4fd0a0ebaf2c0ee2cfcc5801ee3ec753f))
+
 ## [2.1.2](https://github.com/healthinal/typescript-schema-transformer/compare/v2.1.1...v2.1.2) (2022-01-04)
 
 
