@@ -46,7 +46,7 @@
     "rollup": "^2.0.0",
     "rollup-plugin-filesize": "^7.0.0",
     "rollup-plugin-terser": "^5.1.2",
-    "semantic-release": "^17.0.0",
+    "semantic-release": "^19.0.3",
     "tslint": "^5.20.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-standard": "^9.0.0",
